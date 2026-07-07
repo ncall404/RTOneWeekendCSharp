@@ -40,7 +40,8 @@ public class Sphere : Hittable
 
 		rec.RayHitDistance = root;
 		rec.P = r.At(rec.RayHitDistance);
-		rec.Normal = (rec.P - center) / radius;
+		Vec3 outwardNormal = (rec.P - center) / radius;
+		rec.SetFaceNormal(r, outwardNormal);
 
 		return true;
 	}
