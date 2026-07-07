@@ -7,6 +7,15 @@ public ref struct HitRecord
 	public Vec3 P; // Point of intersection.
 	public Vec3 Normal;
 	public double RayHitDistance; // Distance from ray origin to hit point; also known as t in the tutorial.
+
+	public bool FrontFace;
+
+	// Sets the HitRecord normal vector based on if the ray is inside or outside of the hittable object.
+	public void SetFaceNormal(in Ray r, in Vec3 outwardNormal)
+	{
+		FrontFace = Vec3.Dot(r.Direction, outwardNormal) < 0;
+		Normal = FrontFace ? outwardNormal : -outwardNormal; // Outside of object : Inside of object
+	}
 }
 
 public abstract class Hittable
