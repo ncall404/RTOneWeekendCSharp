@@ -9,136 +9,148 @@ namespace RTOneWeekend;
 
 class Program
 {
-	private static readonly double aspectRatio = 16.0 / 9.0;
-	private static readonly int width = 400;
-	private static int height = (int)(width / aspectRatio);
+    private static readonly double aspectRatio = 16.0 / 9.0;
+    private static readonly int width = 400;
+    private static int height = (int)(width / aspectRatio);
 
-	[STAThread]
-	static void Main(string[] args)
-	{	
-		// Make sure that image height is at least 1.
-		height = (height < 1) ? 1 : height;
+    [STAThread]
+    static void Main(string[] args)
+    {
+        // Make sure that image height is at least 1.
+        height = (height < 1) ? 1 : height;
 
-		if (!SDL.Init(SDL.InitFlags.Video))
-		{
-			SDL.LogError(SDL.LogCategory.System, $"SDL could not initialize: {SDL.GetError()}");
-			return;
-		}
+        if (!SDL.Init(SDL.InitFlags.Video))
+        {
+            SDL.LogError(SDL.LogCategory.System, $"SDL could not initialize: {SDL.GetError()}");
+            return;
+        }
 
         if (!SDL.CreateWindowAndRenderer("SDL3 Create Window", width * 2, height * 2, 0, out var window, out var renderer))
-		{
-			SDL.LogError(SDL.LogCategory.Application, $"Error creating window and rendering: {SDL.GetError()}");
-			return;
-		}
+        {
+            SDL.LogError(SDL.LogCategory.Application, $"Error creating window and rendering: {SDL.GetError()}");
+            return;
+        }
 
-		// Streaming texture for pixel data with 4 bytes per pixel (RGBA8888)
-		var texture = SDL.CreateTexture(renderer, SDL.PixelFormat.RGBA8888, SDL.TextureAccess.Streaming, width, height);
+        // Streaming texture for pixel data with 4 bytes per pixel (RGBA8888)
+        var texture = SDL.CreateTexture(renderer, SDL.PixelFormat.RGBA8888, SDL.TextureAccess.Streaming, width, height);
         SDL.SetTextureScaleMode(texture, SDL.ScaleMode.Nearest);
-		if (texture == IntPtr.Zero)
-		{
-			SDL.LogError(SDL.LogCategory.Error, $"Texture creation failed: {SDL.GetError()}");
-			SDL.DestroyRenderer(renderer);
-			SDL.DestroyWindow(window);
-			return;
-		}
-		
-		// SDL.SetRenderDrawColor(renderer, 100, 150, 200, 0);
+        if (texture == IntPtr.Zero)
+        {
+            SDL.LogError(SDL.LogCategory.Error, $"Texture creation failed: {SDL.GetError()}");
+            SDL.DestroyRenderer(renderer);
+            SDL.DestroyWindow(window);
+            return;
+        }
 
-		// Update texture (move to inside of loop once anything is dynamic/temporal)
-		byte[] pixelBuffer = RenderScene(width, height);
-		IntPtr pixelsPtr = IntPtr.Zero;
-		int pitch = 0;
-		if (SDL.LockTexture(texture, IntPtr.Zero, out pixelsPtr, out pitch))
-		{
-			Marshal.Copy(pixelBuffer, 0, pixelsPtr, pixelBuffer.Length);
-			SDL.UnlockTexture(texture);
-		}
+        // SDL.SetRenderDrawColor(renderer, 100, 150, 200, 0);
+
+        // Update texture (move to inside of loop once anything is dynamic/temporal)
+        byte[] pixelBuffer = RenderScene(width, height);
+        IntPtr pixelsPtr = IntPtr.Zero;
+        int pitch = 0;
+        if (SDL.LockTexture(texture, IntPtr.Zero, out pixelsPtr, out pitch))
+        {
+            Marshal.Copy(pixelBuffer, 0, pixelsPtr, pixelBuffer.Length);
+            SDL.UnlockTexture(texture);
+        }
 
 
-		var loop = true;
+        var loop = true;
 
-		while (loop)
-		{
-			while (SDL.PollEvent(out var e))
-			{
-				if (e.Type == (uint)SDL.EventType.Quit)
-				{
-					loop = false;
-				}
-			}
+        while (loop)
+        {
+            while (SDL.PollEvent(out var e))
+            {
+                if (e.Type == (uint)SDL.EventType.Quit)
+                {
+                    loop = false;
+                }
+            }
 
-			SDL.RenderClear(renderer);
-			SDL.RenderTexture(renderer, texture, IntPtr.Zero, IntPtr.Zero);
-			SDL.RenderPresent(renderer);
-		}
+            SDL.RenderClear(renderer);
+            SDL.RenderTexture(renderer, texture, IntPtr.Zero, IntPtr.Zero);
+            SDL.RenderPresent(renderer);
+        }
 
-		SDL.DestroyRenderer(renderer);
-		SDL.DestroyWindow(window);
+        SDL.DestroyRenderer(renderer);
+        SDL.DestroyWindow(window);
 
-		SDL.Quit();
-	}
+        SDL.Quit();
+    }
 
-	private static bool HitSphere(Vec3 center, double radius, Ray r)
-	{
-		Vec3 oc = center - r.Origin;
-		double a = Vec3.Dot(r.Direction, r.Direction);
-		double b = -2.0 * Vec3.Dot(r.Direction, oc);
-		double c = Vec3.Dot(oc, oc) - radius * radius;
-		double discriminant = b * b - 4 * a * c;
-		return discriminant >= 0;
-	}
+    private static double HitSphere(Vec3 center, double radius, Ray r)
+    {
+        Vec3 oc = center - r.Origin;
+        double a = r.Direction.LengthSquared();
+        double h = Vec3.Dot(r.Direction, oc);
+        double c = oc.LengthSquared() - radius*radius;
+        double discriminant = h*h - a*c;
 
-	private static Vec3 RayColor(Ray r)
-	{
-		if (HitSphere(new Vec3(0, 0, -1), 0.5, r))
-			return new Vec3(1.0, 0.0, 0.0);
+        if (discriminant < 0)
+        {
+            return -1.0;
+        }
+        else
+        {
+            return (-h - Math.Sqrt(discriminant)) / a;
+        }
+    }
 
-		Vec3 unitDirection = Vec3.UnitVector(r.Direction);
-		double a = 0.5 * (unitDirection.Y + 1.0);
-		return (1.0 - a) * new Vec3(1.0, 1.0, 1.0) + a * new Vec3(0.5, 0.7, 1.0); // Lerp between light blue and white based on ray Y position.
-	}
+    private static Vec3 RayColor(Ray r)
+    {
+        double rayHitDistance = HitSphere(new Vec3(0, 0, -1), 0.5, r);
+        if (rayHitDistance > 0.0)
+        {
+            Vec3 normal = Vec3.UnitVector(r.At(rayHitDistance) - new Vec3(0, 0, -1));
+            return 0.5 * new Vec3(normal.X + 1, normal.Y + 1, normal.Z + 1);
+        }
 
-	private static byte[] RenderScene(int width, int height)
-	{
-		// Camera
-		double focalLength = 1.0;
-		double viewportHeight = 2.0;
-		double viewportWidth = viewportHeight * (width / (double)height);
-		Vec3 cameraCenter = new(0, 0, 0);
+        Vec3 unitDirection = Vec3.UnitVector(r.Direction);
+        double a = 0.5 * (unitDirection.Y + 1.0);
+        return (1.0 - a) * new Vec3(1.0, 1.0, 1.0) + a * new Vec3(0.5, 0.7, 1.0); // Lerp between light blue and white based on ray Y position.
+    }
 
-		// Calculate the vectors across the horizontal and down the vertical viewport edges.
-		Vec3 viewportU = new(viewportWidth, 0, 0);
-		Vec3 viewportV = new(0, -viewportHeight, 0);
+    private static byte[] RenderScene(int width, int height)
+    {
+        // Camera
+        double focalLength = 1.0;
+        double viewportHeight = 2.0;
+        double viewportWidth = viewportHeight * (width / (double)height);
+        Vec3 cameraCenter = new(0, 0, 0);
 
-		// Calculate the horizontal and vertical delta vectors from pixel to pixel.
-		Vec3 pixelDeltaU = viewportU / width;
-		Vec3 pixelDeltaV = viewportV / height;
+        // Calculate the vectors across the horizontal and down the vertical viewport edges.
+        Vec3 viewportU = new(viewportWidth, 0, 0);
+        Vec3 viewportV = new(0, -viewportHeight, 0);
 
-		// Calculate the location of the upper left pixel of the viewport.
-		Vec3 viewportUpperLeft = cameraCenter - new Vec3(0, 0, focalLength) - viewportU/2 - viewportV/2;
+        // Calculate the horizontal and vertical delta vectors from pixel to pixel.
+        Vec3 pixelDeltaU = viewportU / width;
+        Vec3 pixelDeltaV = viewportV / height;
+
+        // Calculate the location of the upper left pixel of the viewport.
+        Vec3 viewportUpperLeft = cameraCenter - new Vec3(0, 0, focalLength) - viewportU/2 - viewportV/2;
 		Vec3 pixel00Location = viewportUpperLeft + 0.5 * (pixelDeltaU + pixelDeltaV);
 
-		// Pixel buffer.
-		var pixels = new byte[width * height * 4];
+        // Pixel buffer.
+        var pixels = new byte[width * height * 4];
 
-		// Draw to each pixel. TODO: Switch outside loop to "Parallel.For" later in the tutorials for better performance.
-		for (int y = 0; y < height; y++)
-		{
-			for (int x = 0; x < width; x++)
-			{
-				int offset = (y * width + x) * 4;
+        // Draw to each pixel. TODO: Switch outside loop to "Parallel.For" later in the tutorials for better performance.
+        for (int y = 0; y < height; y++)
+        {
+            for (int x = 0; x < width; x++)
+            {
+                int offset = (y * width + x) * 4;
 
-				Vec3 pixelCenter = pixel00Location + (x * pixelDeltaU) + (y * pixelDeltaV);
-				Vec3 rayDirection = pixelCenter - cameraCenter;
-				Ray r = new(cameraCenter, rayDirection);
-				Vec3 rayColor = RayColor(r);
+                Vec3 pixelCenter = pixel00Location + (x * pixelDeltaU) + (y * pixelDeltaV);
+                Vec3 rayDirection = pixelCenter - cameraCenter;
+                Ray r = new(cameraCenter, rayDirection);
+                Vec3 rayColor = RayColor(r);
 
-				// Pack color into 32 bit uint
-				uint pixelColor = (uint)(((byte)(rayColor.R * 255) << 24) | ((byte)(rayColor.G * 255) << 16) | ((byte)(rayColor.B * 255) << 8) | SDL.AlphaOpaque);
-				BitConverter.TryWriteBytes(pixels.AsSpan(offset, 4), pixelColor);
-			}
-		}
+                // Pack color into 32 bit uint
+                uint pixelColor = (uint)(((byte)(rayColor.R * 255) << 24) | ((byte)(rayColor.G * 255) << 16) | ((byte)(rayColor.B * 255) << 8) | SDL.AlphaOpaque);
+                BitConverter.TryWriteBytes(pixels.AsSpan(offset, 4), pixelColor);
+            }
+        }
 
-		return pixels;
-	}
+        return pixels;
+    }
 }
