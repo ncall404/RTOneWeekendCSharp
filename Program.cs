@@ -92,7 +92,7 @@ class Program
         }
         else
         {
-            return (-h - Math.Sqrt(discriminant)) / a;
+            return (h - Math.Sqrt(discriminant)) / a;
         }
     }
 
