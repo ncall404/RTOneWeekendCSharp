@@ -25,7 +25,7 @@ class Program
 			return;
 		}
 
-		if (!SDL.CreateWindowAndRenderer("SDL3 Create Window", width, height, 0, out var window, out var renderer))
+        if (!SDL.CreateWindowAndRenderer("SDL3 Create Window", width * 2, height * 2, 0, out var window, out var renderer))
 		{
 			SDL.LogError(SDL.LogCategory.Application, $"Error creating window and rendering: {SDL.GetError()}");
 			return;
@@ -33,6 +33,7 @@ class Program
 
 		// Streaming texture for pixel data with 4 bytes per pixel (RGBA8888)
 		var texture = SDL.CreateTexture(renderer, SDL.PixelFormat.RGBA8888, SDL.TextureAccess.Streaming, width, height);
+        SDL.SetTextureScaleMode(texture, SDL.ScaleMode.Nearest);
 		if (texture == IntPtr.Zero)
 		{
 			SDL.LogError(SDL.LogCategory.Error, $"Texture creation failed: {SDL.GetError()}");
