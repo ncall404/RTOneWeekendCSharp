@@ -1,8 +1,8 @@
 // Class for representing the hittable geometry of a sphere.
 
-using RTOneWeekend.core;
+using RTOneWeekend.Core;
 
-namespace RTOneWeekend.geometry;
+namespace RTOneWeekend.Geometry;
 
 public class Sphere : Hittable
 {

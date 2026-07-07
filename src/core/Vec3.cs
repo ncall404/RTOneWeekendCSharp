@@ -2,7 +2,7 @@
 
 using System.Runtime.CompilerServices; // Using aggressive inlining since that apparently removes a lot of the function overhead that is normally there!
 
-namespace RTOneWeekend.core;
+namespace RTOneWeekend.Core;
 
 public readonly struct Vec3(double x, double y, double z)
 {

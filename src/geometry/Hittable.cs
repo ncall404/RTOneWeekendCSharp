@@ -1,8 +1,8 @@
 // Hitrecord struct and Hittable abstract class for representing objects intersectable by rays in the raytracing.
 
-using RTOneWeekend.core;
+using RTOneWeekend.Core;
 
-namespace RTOneWeekend.geometry;
+namespace RTOneWeekend.Geometry;
 
 public ref struct HitRecord
 {

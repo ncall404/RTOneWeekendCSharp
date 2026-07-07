@@ -2,7 +2,7 @@
 
 using System.Runtime.CompilerServices;
 
-namespace RTOneWeekend.core;
+namespace RTOneWeekend.Core;
 
 public readonly struct Ray(Vec3 origin, Vec3 direction)
 {

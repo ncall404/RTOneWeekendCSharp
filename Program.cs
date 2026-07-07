@@ -3,7 +3,7 @@
 using System.Runtime.InteropServices;
 using SDL3;
 
-using RTOneWeekend.core;
+using RTOneWeekend.Core;
 
 namespace RTOneWeekend;
 
