@@ -4,7 +4,7 @@ using RTOneWeekend.Core;
 
 namespace RTOneWeekend.Geometry;
 
-class HittableList : Hittable
+public class HittableList : Hittable
 {
 	public List<Hittable> Objects {get;} = [];
 
