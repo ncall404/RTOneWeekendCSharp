@@ -1,9 +1,11 @@
 ﻿// A software raytracer based on RayTracing In One Weekend but in C#! (https://raytracing.github.io/books/RayTracingInOneWeekend.html)
+global using RTOneWeekend.Utility;
 
 using System.Runtime.InteropServices;
 using SDL3;
 
 using RTOneWeekend.Core;
+using RTOneWeekend.Geometry;
 
 namespace RTOneWeekend;
 
@@ -44,8 +46,11 @@ class Program
 
         // SDL.SetRenderDrawColor(renderer, 100, 150, 200, 0);
 
+		// Create the initial scene.
+		HittableList world = InitializeScene();
+
         // Update texture (move to inside of loop once anything is dynamic/temporal)
-        byte[] pixelBuffer = RenderScene(width, height);
+        byte[] pixelBuffer = RenderScene(width, height, world);
         IntPtr pixelsPtr = IntPtr.Zero;
         int pitch = 0;
         if (SDL.LockTexture(texture, IntPtr.Zero, out pixelsPtr, out pitch))
@@ -82,39 +87,21 @@ class Program
         SDL.Quit();
     }
 
-    private static double HitSphere(Vec3 center, double radius, Ray r)
+    private static Vec3 RayColor(Ray r, Hittable world)
     {
-        Vec3 oc = center - r.Origin;
-        double a = r.Direction.LengthSquared();
-        double h = Vec3.Dot(r.Direction, oc);
-        double c = oc.LengthSquared() - radius*radius;
-        double discriminant = h*h - a*c;
+        HitRecord rec = default;
+		if (world.Hit(r, 0, double.PositiveInfinity, ref rec))
+		{
+			return 0.5 * (rec.Normal + new Vec3(1, 1, 1));
+		}
 
-        if (discriminant < 0)
-        {
-            return -1.0;
-        }
-        else
-        {
-            return (h - Math.Sqrt(discriminant)) / a;
-        }
-    }
-
-    private static Vec3 RayColor(Ray r)
-    {
-        double rayHitDistance = HitSphere(new Vec3(0, 0, -1), 0.5, r);
-        if (rayHitDistance > 0.0)
-        {
-            Vec3 normal = Vec3.UnitVector(r.At(rayHitDistance) - new Vec3(0, 0, -1));
-            return 0.5 * new Vec3(normal.X + 1, normal.Y + 1, normal.Z + 1);
-        }
 
         Vec3 unitDirection = Vec3.UnitVector(r.Direction);
         double a = 0.5 * (unitDirection.Y + 1.0);
         return (1.0 - a) * new Vec3(1.0, 1.0, 1.0) + a * new Vec3(0.5, 0.7, 1.0); // Lerp between light blue and white based on ray Y position.
     }
 
-    private static byte[] RenderScene(int width, int height)
+    private static byte[] RenderScene(int width, int height, HittableList world)
     {
         // Camera
         double focalLength = 1.0;
@@ -131,8 +118,8 @@ class Program
         Vec3 pixelDeltaV = viewportV / height;
 
         // Calculate the location of the upper left pixel of the viewport.
-        Vec3 viewportUpperLeft = cameraCenter - new Vec3(0, 0, focalLength) - viewportU/2 - viewportV/2;
-		Vec3 pixel00Location = viewportUpperLeft + 0.5 * (pixelDeltaU + pixelDeltaV);
+        Vec3 viewportUpperLeft = cameraCenter - new Vec3(0, 0, focalLength) - viewportU / 2 - viewportV / 2;
+        Vec3 pixel00Location = viewportUpperLeft + 0.5 * (pixelDeltaU + pixelDeltaV);
 
         // Pixel buffer.
         var pixels = new byte[width * height * 4];
@@ -147,7 +134,7 @@ class Program
                 Vec3 pixelCenter = pixel00Location + (x * pixelDeltaU) + (y * pixelDeltaV);
                 Vec3 rayDirection = pixelCenter - cameraCenter;
                 Ray r = new(cameraCenter, rayDirection);
-                Vec3 rayColor = RayColor(r);
+                Vec3 rayColor = RayColor(r, world);
 
                 // Pack color into 32 bit uint
                 uint pixelColor = (uint)(((byte)(rayColor.R * 255) << 24) | ((byte)(rayColor.G * 255) << 16) | ((byte)(rayColor.B * 255) << 8) | SDL.AlphaOpaque);
@@ -157,4 +144,14 @@ class Program
 
         return pixels;
     }
+
+	// Creates the initial scene.
+	private static HittableList InitializeScene()
+	{
+		HittableList world = new(new Sphere(new Vec3(0, 0, -1), 0.5));
+
+		world.Add(new Sphere(new Vec3(0, -100.5, -1), 100)); // Ground sphere
+
+		return world;
+	}
 }
