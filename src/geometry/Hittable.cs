@@ -22,5 +22,5 @@ public ref struct HitRecord
 
 public abstract class Hittable
 {
-	public abstract bool Hit(in Ray r, double rayTMin, double rayTMax, ref HitRecord rec);
+	public abstract bool Hit(in Ray r, Interval rayT, ref HitRecord rec);
 }

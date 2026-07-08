@@ -15,7 +15,7 @@ public class Sphere : Hittable
 		this.radius = Math.Max(0, radius);
 	}
 
-	public override bool Hit(in Ray r, double rayTMin, double rayTMax, ref HitRecord rec)
+	public override bool Hit(in Ray r, Interval rayT, ref HitRecord rec)
 	{
 		Vec3 oc = center - r.Origin;
         double a = r.Direction.LengthSquared();
@@ -31,10 +31,10 @@ public class Sphere : Hittable
 
 		// Find the nearest root that lies in the acceptable range of rayTMin and rayTMax.
 		double root = (h - sqrtDiscriminant) / a;
-		if (root <= rayTMin || rayTMax <= root)
+		if (root <= rayT.Min || rayT.Max <= root)
 		{
 			root = (h + sqrtDiscriminant) / a;
-			if (root <= rayTMin || rayTMax <= root)
+			if (root <= rayT.Min || rayT.Max <= root)
 				return false;
 		}
 

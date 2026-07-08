@@ -90,7 +90,7 @@ class Program
     private static Vec3 RayColor(Ray r, Hittable world)
     {
         HitRecord rec = default;
-		if (world.Hit(r, 0, double.PositiveInfinity, ref rec))
+		if (world.Hit(r, new Interval(0, double.PositiveInfinity), ref rec))
 		{
 			return 0.5 * (rec.Normal + new Vec3(1, 1, 1));
 		}

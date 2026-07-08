@@ -18,15 +18,15 @@ class HittableList : Hittable
 
 	public void Add(Hittable obj) => Objects.Add(obj);
 
-	public override bool Hit(in Ray r, double rayTMin, double rayTMax, ref HitRecord rec)
+	public override bool Hit(in Ray r, Interval rayT, ref HitRecord rec)
 	{
 		HitRecord tempRec = default;
 		bool hitAnything = false;
-		double closestSoFar = rayTMax;
+		double closestSoFar = rayT.Max;
 		
 		foreach(Hittable obj in Objects)
 		{
-			if (obj.Hit(r, rayTMin, closestSoFar, ref tempRec))
+			if (obj.Hit(r, new Interval(rayT.Min, closestSoFar), ref tempRec))
 			{
 				hitAnything = true;
 				closestSoFar = tempRec.RayHitDistance;
