@@ -65,6 +65,10 @@ class Program
                 {
                     loop = false;
                 }
+                else if (e.Type == (uint)SDL.EventType.KeyDown && e.Key.Key == SDL.Keycode.Escape)
+                {
+                    loop = false;
+                }
             }
 
             SDL.RenderClear(renderer);
