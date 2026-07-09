@@ -34,7 +34,7 @@ public class Camera
                 Vec3 rayColor = RayColor(r, world);
 
                 // Pack color into 32 bit uint
-                uint pixelColor = (uint)(((byte)(rayColor.R * 255) << 24) | ((byte)(rayColor.G * 255) << 16) | ((byte)(rayColor.B * 255) << 8) | SDL.AlphaOpaque);
+                uint pixelColor = Vec3.WriteColor(rayColor, (byte)SDL.AlphaOpaque);
                 BitConverter.TryWriteBytes(pixelBuffer.AsSpan(offset, 4), pixelColor);
             }
         }
