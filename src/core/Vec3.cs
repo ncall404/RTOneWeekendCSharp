@@ -35,7 +35,7 @@ public readonly struct Vec3(double x, double y, double z)
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	public static Vec3 operator /(Vec3 v, double s) => new(v.X / s, v.Y / s, v.Z / s);
 
-	// Vector-specific
+	// Vector-specific functions
 	public double Length() => Math.Sqrt(LengthSquared());
 	public double LengthSquared() => X * X + Y * Y + Z * Z;
 
@@ -54,6 +54,20 @@ public readonly struct Vec3(double x, double y, double z)
 
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	public static Vec3 UnitVector(Vec3 v) => v / v.Length();
+
+	// Color-specific functions
+		// Packs a color into a uint format compatible with the texture format being used for SDL.
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static uint WriteColor(Vec3 color, byte alpha = 255)
+	{
+		// Translate from [0,1] to [0,255]
+		Interval intensity = new(0.000, 0.999);
+		byte r = (byte)(256 * intensity.Clamp(color.R));
+		byte g = (byte)(256 * intensity.Clamp(color.G));
+		byte b = (byte)(256 * intensity.Clamp(color.B));
+		
+		return (uint)((r << 24) | (g << 16) | (b << 8) | (byte)alpha);
+	}
 
 	// Utility
 	public override string ToString() => $"({X}, {Y}, {Z})";
