@@ -31,14 +31,30 @@ public class Camera
             {
                 int offset = (y * Width + x) * 4;
 
-                Vec3 pixelCenter = Pixel00Location + (x * PixelDeltaU) + (y * PixelDeltaV);
-                Vec3 rayDirection = pixelCenter - CameraCenter;
-                Ray r = new(CameraCenter, rayDirection);
-                Vec3 rayColor = RayColor(r, world);
+				if (Settings.AntiAliasing)
+				{
+					Vec3 rayColor = new(0, 0, 0);
+					for (int sample = 0; sample < SamplesPerPixel; sample++)
+					{
+						Ray r = GetRay(x, y);
+						rayColor += RayColor(r, world);
+					}
 
-                // Pack color into 32 bit uint
-                uint pixelColor = Vec3.WriteColor(rayColor, (byte)SDL.AlphaOpaque);
-                BitConverter.TryWriteBytes(pixelBuffer.AsSpan(offset, 4), pixelColor);
+					// Pack color into 32 bit uint
+					uint pixelColor = Vec3.WriteColor(rayColor * PixelSamplesScale, (byte)SDL.AlphaOpaque);
+					BitConverter.TryWriteBytes(pixelBuffer.AsSpan(offset, 4), pixelColor);
+				} else
+				{
+					Vec3 pixelCenter = Pixel00Location + (x * PixelDeltaU) + (y * PixelDeltaV);
+					Vec3 rayDirection = pixelCenter - CameraCenter;
+					Ray r = new(CameraCenter, rayDirection);
+					Vec3 rayColor = RayColor(r, world);
+
+					// Pack color into 32 bit uint
+					uint pixelColor = Vec3.WriteColor(rayColor, (byte)SDL.AlphaOpaque);
+					BitConverter.TryWriteBytes(pixelBuffer.AsSpan(offset, 4), pixelColor);
+				}
+                
             }
         }
 
