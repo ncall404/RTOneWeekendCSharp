@@ -48,17 +48,10 @@ class Program
             SDL.DestroyWindow(window);
             return;
         }
-		SDL.SetTextureScaleMode(texture, SDL.ScaleMode.Nearest); // Set the texture to the corrent scaling mode to not be blurry if the window is a higher resolution.
+		SDL.SetTextureScaleMode(texture, SDL.ScaleMode.Nearest); // Set the texture to the correct scaling mode to not be blurry if the window is a higher resolution.
 
-        // Update texture (move to inside of loop once anything is dynamic/temporal)
-        IntPtr pixelsPtr = IntPtr.Zero;
-        int pitch = 0;
-        if (SDL.LockTexture(texture, IntPtr.Zero, out pixelsPtr, out pitch))
-        {
-            Marshal.Copy(pixelBuffer, 0, pixelsPtr, pixelBuffer.Length);
-            SDL.UnlockTexture(texture);
-        }
-
+		// Do initial render to the texture.
+		UpdateTextureRender(pixelBuffer, camera, world, texture);
 
         var loop = true;
 
@@ -70,11 +63,33 @@ class Program
                 {
                     loop = false;
                 }
+				// Stops the program.
                 else if (e.Type == (uint)SDL.EventType.KeyDown && e.Key.Key == SDL.Keycode.Escape)
                 {
-                    loop = false;
+					loop = false;
                 }
+				// Toggles anti-aliasing on/off.
+				else if (e.Type == (uint)SDL.EventType.KeyDown && e.Key.Key == SDL.Keycode.Alpha1)
+				{
+					Settings.AntiAliasing = !Settings.AntiAliasing;
+					if (!Settings.RealTimeRender)
+					{
+						UpdateTextureRender(pixelBuffer, camera, world, texture);
+					}
+				}
+				// Toggles real-time rendering on/off.
+				else if (e.Type == (uint)SDL.EventType.KeyDown && e.Key.Key == SDL.Keycode.Alpha2)
+				{
+					Settings.RealTimeRender = !Settings.RealTimeRender;
+				}
             }
+
+			if (Settings.RealTimeRender)
+			{
+				pixelBuffer = camera.Render(world);
+				UpdateTextureRender(pixelBuffer, camera, world, texture);
+			}
+			
 
             SDL.RenderClear(renderer);
             SDL.RenderTexture(renderer, texture, IntPtr.Zero, IntPtr.Zero);
@@ -95,5 +110,18 @@ class Program
 		world.Add(new Sphere(new Vec3(0, -100.5, -1), 100)); // Ground sphere
 
 		return world;
+	}
+
+	private static void UpdateTextureRender(byte[] pixelBuffer, Camera camera, HittableList world, nint texture)
+	{
+		pixelBuffer = camera.Render(world);
+		// Update texture (move to inside of loop once anything is dynamic/temporal)
+		IntPtr pixelsPtr = IntPtr.Zero;
+        int pitch = 0;
+		if (SDL.LockTexture(texture, IntPtr.Zero, out pixelsPtr, out pitch))
+		{
+			Marshal.Copy(pixelBuffer, 0, pixelsPtr, pixelBuffer.Length);
+			SDL.UnlockTexture(texture);
+		}
 	}
 }

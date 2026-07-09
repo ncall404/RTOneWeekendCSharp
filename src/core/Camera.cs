@@ -10,6 +10,9 @@ public class Camera
 	public double AspectRatio = 16.0 / 9.0; // Width over height ratio.
 	public int Width = 400; // Rendered image width.
 	public int Height {get; private set;} // Rendered image height.
+	public int SamplesPerPixel = 10; // Number of samples per pixel for anti-aliasing.
+
+	private double PixelSamplesScale; // Color scale factor for a sum of pixel samples.
 	private Vec3 CameraCenter;
 	private Vec3 Pixel00Location; // Location of the lower left pixel.
 	private Vec3 PixelDeltaU; // Offset to the pixel to the right.
@@ -28,14 +31,30 @@ public class Camera
             {
                 int offset = (y * Width + x) * 4;
 
-                Vec3 pixelCenter = Pixel00Location + (x * PixelDeltaU) + (y * PixelDeltaV);
-                Vec3 rayDirection = pixelCenter - CameraCenter;
-                Ray r = new(CameraCenter, rayDirection);
-                Vec3 rayColor = RayColor(r, world);
+				if (Settings.AntiAliasing)
+				{
+					Vec3 rayColor = new(0, 0, 0);
+					for (int sample = 0; sample < SamplesPerPixel; sample++)
+					{
+						Ray r = GetRay(x, y);
+						rayColor += RayColor(r, world);
+					}
 
-                // Pack color into 32 bit uint
-                uint pixelColor = Vec3.WriteColor(rayColor, (byte)SDL.AlphaOpaque);
-                BitConverter.TryWriteBytes(pixelBuffer.AsSpan(offset, 4), pixelColor);
+					// Pack color into 32 bit uint
+					uint pixelColor = Vec3.WriteColor(rayColor * PixelSamplesScale, (byte)SDL.AlphaOpaque);
+					BitConverter.TryWriteBytes(pixelBuffer.AsSpan(offset, 4), pixelColor);
+				} else
+				{
+					Vec3 pixelCenter = Pixel00Location + (x * PixelDeltaU) + (y * PixelDeltaV);
+					Vec3 rayDirection = pixelCenter - CameraCenter;
+					Ray r = new(CameraCenter, rayDirection);
+					Vec3 rayColor = RayColor(r, world);
+
+					// Pack color into 32 bit uint
+					uint pixelColor = Vec3.WriteColor(rayColor, (byte)SDL.AlphaOpaque);
+					BitConverter.TryWriteBytes(pixelBuffer.AsSpan(offset, 4), pixelColor);
+				}
+                
             }
         }
 
@@ -46,6 +65,8 @@ public class Camera
 	{
 		Height = (int)(Width / AspectRatio);
         Height = (Height < 1) ? 1 : Height; // Make sure that image height is at least 1.
+
+		PixelSamplesScale = 1.0 / SamplesPerPixel;
 
 		CameraCenter = new Vec3(0, 0, 0);
 
@@ -65,6 +86,23 @@ public class Camera
 		// Calculate the location of the upper left pixel of the viewport.
         Vec3 viewportUpperLeft = CameraCenter - new Vec3(0, 0, focalLength) - viewportU / 2 - viewportV / 2;
 		Pixel00Location = viewportUpperLeft + 0.5 * (PixelDeltaU + PixelDeltaV);
+	}
+
+	private Ray GetRay(int x, int y)
+	{
+		// Construct a camera ray originating from the origin and directed at a randomly sampled point around the pixel location i, j.
+		Vec3 offset = SampleSquare();
+		Vec3 pixelSample = Pixel00Location + ((x + offset.X) * PixelDeltaU) + ((y + offset.Y) * PixelDeltaV);
+
+		Vec3 rayOrigin = CameraCenter;
+		Vec3 rayDirection = pixelSample - rayOrigin;
+
+		return new Ray(rayOrigin, rayDirection);
+	}
+
+	private Vec3 SampleSquare() {
+		// Returns the vector to a random point in the [-.5, -.5] - [+.5, +.5] unit square.
+		return new Vec3(RandomNum.RandomDouble() - 0.5, RandomNum.RandomDouble() - 0.5, 0);
 	}
 
 	private static Vec3 RayColor(Ray r, Hittable world)
