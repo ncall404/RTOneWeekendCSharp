@@ -26,6 +26,11 @@ public class Interval
 
 	public bool Surrounds(double x) => Min < x && x < Max;
 
+	public double Clamp(double x)
+	{
+		return Math.Clamp(x, Min, Max);
+	}
+
 	public static readonly Interval Empty = new();
 	public static readonly Interval Universe = new(double.NegativeInfinity, double.PositiveInfinity);
 }
