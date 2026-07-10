@@ -17,32 +17,23 @@ public readonly struct Vec3(double x, double y, double z)
 
 	// Operators
 		// Unary
-	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	public static Vec3 operator -(Vec3 v) => new(-v.X, -v.Y, -v.Z);
 		// Binary
-	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	public static Vec3 operator +(Vec3 a, Vec3 b) => new(a.X + b.X, a.Y + b.Y, a.Z + b.Z);
-	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	public static Vec3 operator -(Vec3 a, Vec3 b) => new(a.X - b.X, a.Y - b.Y, a.Z - b.Z);
 		// Component-wise multiplication
-	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	public static Vec3 operator *(Vec3 a, Vec3 b) => new(a.X * b.X, a.Y * b.Y, a.Z * b.Z);
 		// Scalar
-	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	public static Vec3 operator *(Vec3 v, double s) => new(v.X * s, v.Y * s, v.Z * s);
-	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	public static Vec3 operator *(double s, Vec3 v) => new(v.X * s, v.Y * s, v.Z * s);
-	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	public static Vec3 operator /(Vec3 v, double s) => new(v.X / s, v.Y / s, v.Z / s);
 
 	// Vector-specific functions
 	public double Length() => Math.Sqrt(LengthSquared());
 	public double LengthSquared() => X * X + Y * Y + Z * Z;
 
-	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	public static double Dot(Vec3 a, Vec3 b) => (a.X * b.X) + (a.Y * b.Y) + (a.Z * b.Z);
 
-	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	public static Vec3 Cross(Vec3 a, Vec3 b)
 	{
 		return new Vec3(
@@ -52,12 +43,10 @@ public readonly struct Vec3(double x, double y, double z)
 		);
 	}
 
-	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	public static Vec3 UnitVector(Vec3 v) => v / v.Length();
 
 	// Color-specific functions
 		// Packs a color into a uint format compatible with the texture format being used for SDL.
-	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	public static uint WriteColor(Vec3 color, byte alpha = 255)
 	{
 		// Translate from [0,1] to [0,255]
