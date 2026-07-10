@@ -118,7 +118,7 @@ public class Camera
 		{
 			// return 0.5 * (rec.Normal + new Vec3(1, 1, 1)); // Returns color based on normal direction.
 
-			Vec3 direction = Vec3.RandomOnHemisphere(rec.Normal);
+			Vec3 direction = rec.Normal + Vec3.RandomUnitVector(); // Non-uniform Lambertian distribution for diffuse objects.
 			return 0.5 * RayColor(new Ray(rec.P, direction), depth-1, world);
 		}
 
