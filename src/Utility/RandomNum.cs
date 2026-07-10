@@ -18,6 +18,6 @@ public static class RandomNum
 	// Random double from min to max.
 	public static double RandomDouble(double min, double max)
 	{
-		return min + (max = min) * RandomDouble();
+		return min + (max - min) * RandomDouble();
 	}
 }
