@@ -10,8 +10,8 @@ public class Camera
 	public double AspectRatio = 16.0 / 9.0; // Width over height ratio.
 	public int Width = 400; // Rendered image width.
 	public int Height {get; private set;} // Rendered image height.
-	public int SamplesPerPixel = 50; // Number of samples per pixel for anti-aliasing.
-	public int MaxDepth = 50; // Maximum number of ray bounces into a scene.
+	public int SamplesPerPixel = 100; // Number of samples per pixel for anti-aliasing.
+	public int MaxDepth = 100; // Maximum number of ray bounces into a scene.
 
 	private double PixelSamplesScale; // Color scale factor for a sum of pixel samples.
 	private Vec3 CameraCenter;
