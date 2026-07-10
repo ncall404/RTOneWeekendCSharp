@@ -11,6 +11,7 @@ public class Camera
 	public int Width = 400; // Rendered image width.
 	public int Height {get; private set;} // Rendered image height.
 	public int SamplesPerPixel = 10; // Number of samples per pixel for anti-aliasing.
+	public int MaxDepth = 10; // Maximum number of ray bounces into a scene.
 
 	private double PixelSamplesScale; // Color scale factor for a sum of pixel samples.
 	private Vec3 CameraCenter;
@@ -37,7 +38,7 @@ public class Camera
 					for (int sample = 0; sample < SamplesPerPixel; sample++)
 					{
 						Ray r = GetRay(x, y);
-						rayColor += RayColor(r, world);
+						rayColor += RayColor(r, MaxDepth, world);
 					}
 
 					// Pack color into 32 bit uint
@@ -48,7 +49,7 @@ public class Camera
 					Vec3 pixelCenter = Pixel00Location + (x * PixelDeltaU) + (y * PixelDeltaV);
 					Vec3 rayDirection = pixelCenter - CameraCenter;
 					Ray r = new(CameraCenter, rayDirection);
-					Vec3 rayColor = RayColor(r, world);
+					Vec3 rayColor = RayColor(r, MaxDepth, world);
 
 					// Pack color into 32 bit uint
 					uint pixelColor = Vec3.WriteColor(rayColor, (byte)SDL.AlphaOpaque);
@@ -105,12 +106,20 @@ public class Camera
 		return new Vec3(RandomNum.RandomDouble() - 0.5, RandomNum.RandomDouble() - 0.5, 0);
 	}
 
-	private static Vec3 RayColor(Ray r, Hittable world)
+	private static Vec3 RayColor(Ray r, int depth, Hittable world)
     {
+		// If ray bounce limit is exceeded, no more light is gathered.
+		if (depth <= 0)
+			return new Vec3(0, 0, 0);
+
         HitRecord rec = default;
-		if (world.Hit(r, new Interval(0, double.PositiveInfinity), ref rec))
+		// 0.001 instead of just 0 takes care of shadow acne.
+		if (world.Hit(r, new Interval(0.001, double.PositiveInfinity), ref rec))
 		{
-			return 0.5 * (rec.Normal + new Vec3(1, 1, 1));
+			// return 0.5 * (rec.Normal + new Vec3(1, 1, 1)); // Returns color based on normal direction.
+
+			Vec3 direction = Vec3.RandomOnHemisphere(rec.Normal);
+			return 0.5 * RayColor(new Ray(rec.P, direction), depth-1, world);
 		}
 
 
