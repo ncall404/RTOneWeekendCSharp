@@ -25,8 +25,8 @@ public class Camera
 
 		byte[] pixelBuffer = new byte[Width * Height * 4];
 
-		// Draw to each pixel. TODO: Switch outside loop to "Parallel.For" later in the tutorials for better performance.
-        for (int y = 0; y < Height; y++)
+		// Draw to each pixel.
+		Parallel.For(0, Height, y =>
         {
             for (int x = 0; x < Width; x++)
             {
@@ -57,7 +57,7 @@ public class Camera
 				}
                 
             }
-        }
+        });
 
         return pixelBuffer;
 	}
