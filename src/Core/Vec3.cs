@@ -90,7 +90,7 @@ public readonly struct Vec3(double x, double y, double z)
 		byte g = (byte)(256 * intensity.Clamp(color.G));
 		byte b = (byte)(256 * intensity.Clamp(color.B));
 		
-		return (uint)((r << 24) | (g << 16) | (b << 8) | (byte)alpha);
+		return (uint)((r << 24) | (g << 16) | (b << 8) | alpha);
 	}
 
 	// Utility
