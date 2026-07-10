@@ -8,8 +8,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="SDL3-CS" Version="3.4.10.5" />
-    <PackageReference Include="SDL3-CS.Windows" Version="3.4.10.5" />
+    <PackageReference Include="SDL3-CS" Version="3.4.12" />
+    <PackageReference Include="SDL3-CS.MacOS" Version="3.4.12" />
+    <PackageReference Include="SDL3-CS.Windows" Version="3.4.12" />
   </ItemGroup>
 
 </Project>
