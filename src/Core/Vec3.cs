@@ -81,16 +81,34 @@ public readonly struct Vec3(double x, double y, double z)
 	}
 
 	// Color-specific functions
+		// Converts a color from linear space to gamma space.
+	public static double LinearToGamma(double linearComponent)
+	{
+		if (linearComponent > 0)
+			return Math.Sqrt(linearComponent);
+		else
+			return 0;
+	}
+	
 		// Packs a color into a uint format compatible with the texture format being used for SDL.
 	public static uint WriteColor(Vec3 color, byte alpha = 255)
 	{
+		double r = color.R;
+		double g = color.G;
+		double b = color.B;
+
+		// Apply a linear to gamma transform for gamma 2
+		r = LinearToGamma(r);
+		g = LinearToGamma(g);
+		b = LinearToGamma(b);
+
 		// Translate from [0,1] to [0,255]
 		Interval intensity = new(0.000, 0.999);
-		byte r = (byte)(256 * intensity.Clamp(color.R));
-		byte g = (byte)(256 * intensity.Clamp(color.G));
-		byte b = (byte)(256 * intensity.Clamp(color.B));
+		byte rByte = (byte)(256 * intensity.Clamp(r));
+		byte gByte = (byte)(256 * intensity.Clamp(g));
+		byte bByte = (byte)(256 * intensity.Clamp(b));
 		
-		return (uint)((r << 24) | (g << 16) | (b << 8) | alpha);
+		return (uint)((rByte << 24) | (gByte << 16) | (bByte << 8) | alpha);
 	}
 
 	// Utility
