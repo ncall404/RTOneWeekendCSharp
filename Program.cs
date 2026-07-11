@@ -38,6 +38,7 @@ class Program
             SDL.LogError(SDL.LogCategory.Application, $"Error creating window and rendering: {SDL.GetError()}");
             return;
         }
+		SDL.SetRenderDrawColor(renderer, 0, 150, 0, 255); // Set render draw color for debug text.
 
         // Streaming texture for pixel data with 4 bytes per pixel (RGBA8888)
         var texture = SDL.CreateTexture(renderer, SDL.PixelFormat.RGBA8888, SDL.TextureAccess.Streaming, camera.Width, camera.Height);
@@ -53,8 +54,13 @@ class Program
 		// Do initial render to the texture.
 		UpdateTextureRender(pixelBuffer, camera, world, texture);
 
-        var loop = true;
+		// Peformance monitoring variables for loop.
+		ulong lastCounter = SDL.GetTicks();
+		float currentFps = 0f;
+		float frameTime = 0f;
+		float frameCount = 0f;
 
+		var loop = true;
         while (loop)
         {
             while (SDL.PollEvent(out var e))
@@ -92,7 +98,30 @@ class Program
 			
 
             SDL.RenderClear(renderer);
+
+			// Display the render.
             SDL.RenderTexture(renderer, texture, IntPtr.Zero, IntPtr.Zero);
+
+			// Display performance when doing real-time rendering.
+			if (Settings.RealTimeRender)
+			{
+				ulong currentCounter = SDL.GetTicks();
+				ulong elapsed = currentCounter - lastCounter;
+				frameCount++;
+
+				// Updates every 150 milliseconds
+				if (elapsed >= 150)
+				{
+					currentFps = frameCount / (elapsed / 1000f);
+					frameTime = elapsed / frameCount;
+
+					frameCount = 0f;
+					lastCounter = currentCounter;
+				}
+				SDL.RenderDebugText(renderer, 5, 5, $"fps: {currentFps:F2}");
+				SDL.RenderDebugText(renderer, 5, 15, $"ms: {frameTime:F2}");
+			}
+
             SDL.RenderPresent(renderer);
         }
 
