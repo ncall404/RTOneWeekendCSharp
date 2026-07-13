@@ -1,6 +1,7 @@
 // Hitrecord struct and Hittable abstract class for representing objects intersectable by rays in the raytracing.
 
 using RTOneWeekend.Core;
+using RTOneWeekend.Materials;
 
 namespace RTOneWeekend.Geometry;
 
@@ -8,6 +9,7 @@ public ref struct HitRecord
 {
 	public Vec3 P; // Point of intersection.
 	public Vec3 Normal;
+	public Material Material;
 	public double RayHitDistance; // Distance from ray origin to hit point; also known as t in the tutorial.
 
 	public bool FrontFace;
