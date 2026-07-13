@@ -32,6 +32,13 @@ public readonly struct Vec3(double x, double y, double z)
 	public double Length() => Math.Sqrt(LengthSquared());
 	public double LengthSquared() => X * X + Y * Y + Z * Z;
 
+	// Return true if the vector is close to zero in all dimensions.
+	public bool NearZero()
+	{
+		const double cutoff = 1e-8; // Near-zero value that accounts for floating-point imprecision. It seems it is also called "epsilon threshold".
+		return Math.Abs(X) < cutoff && Math.Abs(Y) < cutoff && Math.Abs(Z) < cutoff;
+	}
+
 	public static Vec3 Random()
 	{
 		return new Vec3(RandomNum.RandomDouble(), RandomNum.RandomDouble(), RandomNum.RandomDouble());
@@ -78,6 +85,12 @@ public readonly struct Vec3(double x, double y, double z)
 			return onUnitSphere;
 		else
 			return -onUnitSphere;
+	}
+
+	// Reflects the ray based on a normal.
+	public static Vec3 Reflect(Vec3 vector, Vec3 normal)
+	{
+		return vector - 2*Dot(vector, normal)*normal;
 	}
 
 	// Color-specific functions
