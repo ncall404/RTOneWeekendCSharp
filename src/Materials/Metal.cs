@@ -1,4 +1,4 @@
-// Lambertian material class for representing reflective surfaces in the scene.
+// Metal material class for representing reflective surfaces in the scene.
 
 using RTOneWeekend.Core;
 using RTOneWeekend.Geometry;
