@@ -7,13 +7,14 @@ namespace RTOneWeekend.Materials;
 
 class Metal: Material
 {
-    private Vec3 albedo;
+    private Vec3 Albedo;
+	public Metal(Vec3 albedo) => Albedo = albedo;
     
 	public override bool Scatter(Ray rayIn, HitRecord rec, out Vec3 attenuation, out Ray scattered)
 	{
 		Vec3 reflected = Vec3.Reflect(rayIn.Direction, rec.Normal);
 		scattered = new Ray(rec.P, reflected);
-		attenuation = albedo;
+		attenuation = Albedo;
 		return true;
 	}
 }
