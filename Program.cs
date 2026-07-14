@@ -150,7 +150,6 @@ class Program
 	private static void UpdateTextureRender(byte[] pixelBuffer, Camera camera, HittableList world, nint texture)
 	{
 		pixelBuffer = camera.Render(world);
-		// Update texture (move to inside of loop once anything is dynamic/temporal)
 		IntPtr pixelsPtr = IntPtr.Zero;
         int pitch = 0;
 		if (SDL.LockTexture(texture, IntPtr.Zero, out pixelsPtr, out pitch))
