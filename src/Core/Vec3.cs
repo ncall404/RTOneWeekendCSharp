@@ -93,6 +93,15 @@ public readonly struct Vec3(double x, double y, double z)
 		return vector - 2*Dot(vector, normal)*normal;
 	}
 
+	// Refracts the ray based on a unit vector, normal, and the ratio of indices of refraction.
+	public static Vec3 Refract(Vec3 uv, Vec3 normal, double etaiOverTat)
+	{
+		double cosTheta = Math.Min(Dot(-uv, normal), 1.0);
+		Vec3 rayOutPerpendicular = etaiOverTat * (uv + cosTheta*normal);
+		Vec3 rayOutParallel = -Math.Sqrt(Math.Abs(1.0 - rayOutPerpendicular.LengthSquared())) * normal;
+		return rayOutPerpendicular + rayOutParallel;
+	}
+
 	// Color-specific functions
 		// Converts a color from linear space to gamma space.
 	public static double LinearToGamma(double linearComponent)
