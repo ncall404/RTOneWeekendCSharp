@@ -26,12 +26,20 @@ class Dielectric : Material
 		bool cannotRefract = ri * sinTheta > 1.0;
 		Vec3 direction;
 
-		if (cannotRefract)
+		if (cannotRefract || Reflectance(cosTheta, ri) > RandomNum.RandomDouble())
 			direction = Vec3.Reflect(unitDirection, rec.Normal);
 		else
 			direction = Vec3.Refract(unitDirection, rec.Normal, ri);
 
 		scattered = new Ray(rec.P, direction);
 		return true;
+	}
+
+	// Use Schlick's approximation for reflectance.
+	private double Reflectance(double cosine, double refractionIndex)
+	{
+		double r0 = (1 - refractionIndex) / (1 + refractionIndex);
+		r0 *= r0;
+		return r0 + (1-r0)*Math.Pow(1-cosine, 5);
 	}
 }
