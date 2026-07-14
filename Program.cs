@@ -34,7 +34,7 @@ class Program
             return;
         }
 
-        if (!SDL.CreateWindowAndRenderer("CSharp Ray Tracer", camera.Width * 2, camera.Height * 2, 0, out var window, out var renderer))
+        if (!SDL.CreateWindowAndRenderer("CSharp Ray Tracer", Settings.WindowWidth, Settings.WindowHeight, 0, out var window, out var renderer))
         {
             SDL.LogError(SDL.LogCategory.Application, $"Error creating window and rendering: {SDL.GetError()}");
             return;
