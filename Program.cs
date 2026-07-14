@@ -7,6 +7,7 @@ using SDL3;
 
 using RTOneWeekend.Core;
 using RTOneWeekend.Geometry;
+using RTOneWeekend.Materials;
 
 namespace RTOneWeekend;
 
@@ -134,9 +135,14 @@ class Program
 	// Creates the initial scene.
 	private static HittableList InitializeScene()
 	{
-		HittableList world = new(new Sphere(new Vec3(0, 0, -1), 0.5));
+		HittableList world = new(new Sphere(new Vec3(0, -100.5, -1), 100, new Lambertian(new Vec3(0.8, 0.8, 0.0)))); // Ground sphere
 
-		world.Add(new Sphere(new Vec3(0, -100.5, -1), 100)); // Ground sphere
+		// Lambertian spheres
+		world.Add(new Sphere(new Vec3(0, 0, -1), 0.5, new Lambertian(new Vec3(0.1, 0.2, 0.5))));
+
+		// Metal spheres
+		world.Add(new Sphere(new Vec3(-1.0, 0.0, -1.0), 0.5, new Metal(new Vec3(0.8, 0.8, 0.8))));
+		world.Add(new Sphere(new Vec3(1.0, 0.0, -1.0), 0.5, new Metal(new Vec3(0.8, 0.6, 0.2))));
 
 		return world;
 	}

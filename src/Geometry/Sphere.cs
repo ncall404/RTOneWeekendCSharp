@@ -1,6 +1,7 @@
 // Class for representing the hittable geometry of a sphere.
 
 using RTOneWeekend.Core;
+using RTOneWeekend.Materials;
 
 namespace RTOneWeekend.Geometry;
 
@@ -8,11 +9,13 @@ public class Sphere : Hittable
 {
 	private Vec3 center;
 	private double radius;
+	private Material material;
 
-	public Sphere(Vec3 center, double radius)
+	public Sphere(Vec3 center, double radius, Material material)
 	{
 		this.center = center;
 		this.radius = Math.Max(0, radius);
+		this.material = material;
 	}
 
 	public override bool Hit(in Ray r, Interval rayT, ref HitRecord rec)
@@ -42,6 +45,7 @@ public class Sphere : Hittable
 		rec.P = r.At(rec.RayHitDistance);
 		Vec3 outwardNormal = (rec.P - center) / radius;
 		rec.SetFaceNormal(r, outwardNormal);
+		rec.Material = material;
 
 		return true;
 	}
