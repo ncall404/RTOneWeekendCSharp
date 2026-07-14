@@ -141,8 +141,8 @@ class Program
 		world.Add(new Sphere(new Vec3(0, 0, -1), 0.5, new Lambertian(new Vec3(0.1, 0.2, 0.5))));
 
 		// Metal spheres
-		world.Add(new Sphere(new Vec3(-1.0, 0.0, -1.0), 0.5, new Metal(new Vec3(0.8, 0.8, 0.8))));
-		world.Add(new Sphere(new Vec3(1.0, 0.0, -1.0), 0.5, new Metal(new Vec3(0.8, 0.6, 0.2))));
+		world.Add(new Sphere(new Vec3(-1.0, 0.0, -1.0), 0.5, new Metal(new Vec3(0.8, 0.8, 0.8), 0.3))); // Left
+		world.Add(new Sphere(new Vec3(1.0, 0.0, -1.0), 0.5, new Metal(new Vec3(0.8, 0.6, 0.2), 1.0))); // Right
 
 		return world;
 	}
