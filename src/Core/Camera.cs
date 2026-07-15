@@ -12,6 +12,7 @@ public class Camera
 	public int Height {get; private set;} // Rendered image height.
 	public int SamplesPerPixel = 100; // Number of samples per pixel for anti-aliasing. Could also probably be called rays-per-pixel.
 	public int MaxDepth = 100; // Maximum number of ray bounces into a scene.
+	public double verticalFOV = 90; // Vertical field of view in degrees.
 
 	private double PixelSamplesScale; // Color scale factor for a sum of pixel samples.
 	private Vec3 CameraCenter;
@@ -73,7 +74,9 @@ public class Camera
 
 		// Determine viewport dimensions.
 		double focalLength = 1.0;
-        double viewportHeight = 2.0;
+		double theta = ConvertUnit.DegreesToRadians(verticalFOV);
+		double h = Math.Tan(theta/2);
+        double viewportHeight = 2.0 * h * focalLength;
         double viewportWidth = viewportHeight * (Width / (double)Height);
 
 		// Calculate the vectors across the horizontal and down the vertical viewport edges.
