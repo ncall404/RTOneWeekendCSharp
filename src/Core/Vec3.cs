@@ -61,6 +61,19 @@ public readonly struct Vec3(double x, double y, double z)
 
 	public static Vec3 UnitVector(Vec3 v) => v / v.Length(); // The same as normalizing a vector.
 
+	// Similar to RandomUnitVector but for two dimensions instead of three. Picks random points on the "defocus" disk. Used for depth-of-field.
+	public static Vec3 RandomInUnitDisk()
+	{
+		while (true)
+		{
+			Vec3 point = new(RandomNum.RandomDouble(-1, 1), RandomNum.RandomDouble(-1, 1), 0);
+			if (point.LengthSquared() < 1)
+			{
+				return point;
+			}
+		}
+	}
+
 	// Uses the rejection method to generate random unit vectors. Simple but I imagine inefficient.
 	// For reference, the rejection method keeps generating vectors until one is valid. Explained better here: https://raytracing.github.io/books/RayTracingInOneWeekend.html#diffusematerials/asimplediffusematerial
 	public static Vec3 RandomUnitVector()
