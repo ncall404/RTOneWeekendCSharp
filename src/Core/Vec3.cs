@@ -59,7 +59,7 @@ public readonly struct Vec3(double x, double y, double z)
 		);
 	}
 
-	public static Vec3 UnitVector(Vec3 v) => v / v.Length();
+	public static Vec3 UnitVector(Vec3 v) => v / v.Length(); // The same as normalizing a vector.
 
 	// Uses the rejection method to generate random unit vectors. Simple but I imagine inefficient.
 	// For reference, the rejection method keeps generating vectors until one is valid. Explained better here: https://raytracing.github.io/books/RayTracingInOneWeekend.html#diffusematerials/asimplediffusematerial
