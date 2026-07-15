@@ -26,7 +26,7 @@ class Program
 		};
 
 		// Do an initial render of the pixel buffer to initialize the camera.
-		byte[] pixelBuffer = camera.Render(world);
+		camera.Render(world);
 
         if (!SDL.Init(SDL.InitFlags.Video))
         {
@@ -53,7 +53,7 @@ class Program
 		SDL.SetTextureScaleMode(texture, SDL.ScaleMode.Nearest); // Set the texture to the correct scaling mode to not be blurry if the window is a higher resolution.
 
 		// Do initial render to the texture.
-		UpdateTextureRender(pixelBuffer, camera, world, texture);
+		UpdateTextureRender(camera, world, texture);
 
 		// Peformance monitoring variables for loop.
 		ulong lastCounter = SDL.GetTicks();
@@ -81,7 +81,7 @@ class Program
 					Settings.AntiAliasing = !Settings.AntiAliasing;
 					if (!Settings.RealTimeRender)
 					{
-						UpdateTextureRender(pixelBuffer, camera, world, texture);
+						UpdateTextureRender(camera, world, texture);
 					}
 				}
 				// Toggles real-time rendering on/off.
@@ -93,8 +93,7 @@ class Program
 
 			if (Settings.RealTimeRender)
 			{
-				pixelBuffer = camera.Render(world);
-				UpdateTextureRender(pixelBuffer, camera, world, texture);
+				UpdateTextureRender(camera, world, texture);
 			}
 			
 
@@ -151,9 +150,9 @@ class Program
 		return world;
 	}
 
-	private static void UpdateTextureRender(byte[] pixelBuffer, Camera camera, HittableList world, nint texture)
+	private static void UpdateTextureRender(Camera camera, HittableList world, nint texture)
 	{
-		pixelBuffer = camera.Render(world);
+		byte[] pixelBuffer = camera.Render(world);
 		IntPtr pixelsPtr = IntPtr.Zero;
         int pitch = 0;
 		if (SDL.LockTexture(texture, IntPtr.Zero, out pixelsPtr, out pitch))
