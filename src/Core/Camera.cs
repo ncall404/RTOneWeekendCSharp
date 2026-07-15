@@ -12,22 +12,29 @@ public class Camera
 	public int Height {get; private set;} // Rendered image height.
 	public int SamplesPerPixel = 100; // Number of samples per pixel for anti-aliasing. Could also probably be called rays-per-pixel.
 	public int MaxDepth = 100; // Maximum number of ray bounces into a scene.
+
 	public double VerticalFOV = 90; // Vertical field of view in degrees.
+	public Vec3 CameraPosition = new(0, 0, 0); // Named lookfrom in the tutorial
+	public Vec3 LookAt = new(0, 0, -1); // Point the camera is looking at. TODO: Replace later with ViewDirection.
+	public Vec3 Up = new(0, 1, 0); // Camera-relatvie up direction.
 
 	private double PixelSamplesScale; // Color scale factor for a sum of pixel samples.
-	private Vec3 CameraCenter;
 	private Vec3 Pixel00Location; // Location of the lower left pixel.
 	private Vec3 PixelDeltaU; // Offset to the pixel to the right.
 	private Vec3 PixelDeltaV; // Offset to the pixel below.
+	private Vec3 u, v, w; // Camera frame basis vectors. (u = pointing right, camera right, v = pointing camera up, w = pointing opposite the view direction)
 
-	public Camera(double aspectRatio, int width, int samplesPerPixel, int maxDepth, double verticalFOV)
+	public Camera(double aspectRatio, int width, int samplesPerPixel, int maxDepth, double verticalFOV, Vec3 cameraPosition, Vec3 lookAt, Vec3 up)
 	{
 		AspectRatio = aspectRatio;
 		Width = width;
 		SamplesPerPixel = samplesPerPixel;
 		MaxDepth = maxDepth;
 		VerticalFOV = verticalFOV;
-		CameraCenter = new Vec3(0, 0, 0);
+		CameraPosition = cameraPosition;
+		LookAt = lookAt;
+		Up = up;
+
 		CalculateViewport(); // Calculate the viewport based on the camera settings.
 	}
 
@@ -59,8 +66,8 @@ public class Camera
 				} else
 				{
 					Vec3 pixelCenter = Pixel00Location + (x * PixelDeltaU) + (y * PixelDeltaV);
-					Vec3 rayDirection = pixelCenter - CameraCenter;
-					Ray r = new(CameraCenter, rayDirection);
+					Vec3 rayDirection = pixelCenter - CameraPosition;
+					Ray r = new(CameraPosition, rayDirection);
 					Vec3 rayColor = RayColor(r, MaxDepth, world);
 
 					// Pack color into 32 bit uint
@@ -83,22 +90,27 @@ public class Camera
 		PixelSamplesScale = 1.0 / SamplesPerPixel;
 
 		// Determine viewport dimensions.
-		double focalLength = 1.0;
+		double focalLength = (CameraPosition - LookAt).Length();
 		double theta = ConvertUnit.DegreesToRadians(VerticalFOV);
 		double h = Math.Tan(theta/2);
         double viewportHeight = 2.0 * h * focalLength;
         double viewportWidth = viewportHeight * (Width / (double)Height);
 
+		// Calculate the u, v, w unit basis vectors for the camera coordinate frame.
+		w = Vec3.UnitVector(CameraPosition - LookAt);
+		u = Vec3.UnitVector(Vec3.Cross(Up, w));
+		v = Vec3.Cross(w, u);
+
 		// Calculate the vectors across the horizontal and down the vertical viewport edges.
-        Vec3 viewportU = new(viewportWidth, 0, 0);
-        Vec3 viewportV = new(0, -viewportHeight, 0);
+        Vec3 viewportU = viewportWidth * u; // Vector across the viewport horizontal edge.
+        Vec3 viewportV = viewportHeight * -v; // Vector across the viewport vertical edge.
 
 		// Calculate the horizontal and vertical delta vectors from pixel to pixel.
         PixelDeltaU = viewportU / Width;
         PixelDeltaV = viewportV / Height;
 
 		// Calculate the location of the upper left pixel of the viewport.
-        Vec3 viewportUpperLeft = CameraCenter - new Vec3(0, 0, focalLength) - viewportU / 2 - viewportV / 2;
+        Vec3 viewportUpperLeft = CameraPosition - (focalLength * w) - viewportU/2 - viewportV/2;
 		Pixel00Location = viewportUpperLeft + 0.5 * (PixelDeltaU + PixelDeltaV);
 	}
 
@@ -108,7 +120,7 @@ public class Camera
 		Vec3 offset = SampleSquare();
 		Vec3 pixelSample = Pixel00Location + ((x + offset.X) * PixelDeltaU) + ((y + offset.Y) * PixelDeltaV);
 
-		Vec3 rayOrigin = CameraCenter;
+		Vec3 rayOrigin = CameraPosition;
 		Vec3 rayDirection = pixelSample - rayOrigin;
 
 		return new Ray(rayOrigin, rayDirection);

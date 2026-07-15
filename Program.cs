@@ -20,11 +20,14 @@ class Program
 		HittableList world = InitializeScene();
 
 		Camera camera = new(
-			16.0 / 9.0,		// Aspect Ratio
-			400,			// Render Width
-			100,			// Samples per pixel
-			100,			// Max depth (number of bounces for rays)
-			90				// Vertical field of view
+			16.0 / 9.0,				// Aspect ratio
+			400,					// Render width
+			100,					// Samples per pixel
+			100,					// Max depth (number of bounces for rays)
+			90,						// Vertical field of view
+			new(0, 0, 0),		// Camera position.
+			new(0, 0, -1),		// Look at point.
+			new(0, 1, 0)		// Up vector.
 		);
 
 		// Do an initial render of the pixel buffer to initialize the camera.
