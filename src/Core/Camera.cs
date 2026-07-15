@@ -20,9 +20,20 @@ public class Camera
 	private Vec3 PixelDeltaU; // Offset to the pixel to the right.
 	private Vec3 PixelDeltaV; // Offset to the pixel below.
 
+	public Camera(double aspectRatio, int width, int samplesPerPixel, int maxDepth, double verticalFOV)
+	{
+		AspectRatio = aspectRatio;
+		Width = width;
+		SamplesPerPixel = samplesPerPixel;
+		MaxDepth = maxDepth;
+		VerticalFOV = verticalFOV;
+		CameraCenter = new Vec3(0, 0, 0);
+		CalculateViewport(); // Calculate the viewport based on the camera settings.
+	}
+
 	public byte[] Render(HittableList world)
 	{
-		Initialize(); // TODO: Stray from the tutorial and move this out of the render function and make it a constructor for the Camera object. There is no need to initialize the camera every frame.
+		CalculateViewport();
 
 		byte[] pixelBuffer = new byte[Width * Height * 4];
 
@@ -63,14 +74,13 @@ public class Camera
         return pixelBuffer;
 	}
 
-	private void Initialize()
+	// Calculates the viewport based on camera settings.
+	public void CalculateViewport()
 	{
 		Height = (int)(Width / AspectRatio);
         Height = (Height < 1) ? 1 : Height; // Make sure that image height is at least 1.
 
 		PixelSamplesScale = 1.0 / SamplesPerPixel;
-
-		CameraCenter = new Vec3(0, 0, 0);
 
 		// Determine viewport dimensions.
 		double focalLength = 1.0;

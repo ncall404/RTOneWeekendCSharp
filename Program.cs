@@ -19,14 +19,16 @@ class Program
 		// Create the initial scene.
 		HittableList world = InitializeScene();
 
-		Camera camera = new()
-		{
-			AspectRatio = 16.0 / 9.0,
-			Width = 400
-		};
+		Camera camera = new(
+			16.0 / 9.0,		// Aspect Ratio
+			400,			// Render Width
+			100,			// Samples per pixel
+			100,			// Max depth (number of bounces for rays)
+			90				// Vertical field of view
+		);
 
 		// Do an initial render of the pixel buffer to initialize the camera.
-		camera.Render(world);
+		// camera.Render(world);
 
         if (!SDL.Init(SDL.InitFlags.Video))
         {
@@ -93,6 +95,7 @@ class Program
 
 			if (Settings.RealTimeRender)
 			{
+				camera.CalculateViewport();
 				UpdateTextureRender(camera, world, texture);
 			}
 			
