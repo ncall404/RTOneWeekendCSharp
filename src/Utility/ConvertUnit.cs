@@ -2,7 +2,7 @@
 
 namespace RTOneWeekend.Utility;
 
-public static class Convert
+public static class ConvertUnit
 {
 	public static double DegreesToRadians(double degrees) => degrees * Math.PI / 180;
 }
