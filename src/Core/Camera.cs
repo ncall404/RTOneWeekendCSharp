@@ -136,8 +136,6 @@ public class Camera
 				return attenuation * RayColor(scattered, depth - 1, world);
 
 			return new Vec3(0, 0, 0);
-			// Vec3 direction = rec.Normal + Vec3.RandomUnitVector();
-			// return 0.5 * RayColor(new Ray(rec.P, direction), depth-1, world);
 		}
 
 
