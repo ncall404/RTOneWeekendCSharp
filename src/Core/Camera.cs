@@ -21,7 +21,7 @@ public class Camera
 
 	public byte[] Render(HittableList world)
 	{
-		Initialize();
+		Initialize(); // TODO: Stray from the tutorial and move this out of the render function and make it a constructor for the Camera object. There is no need to initialize the camera every frame.
 
 		byte[] pixelBuffer = new byte[Width * Height * 4];
 
