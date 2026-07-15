@@ -138,11 +138,15 @@ class Program
 		HittableList world = new(new Sphere(new Vec3(0, -100.5, -1), 100, new Lambertian(new Vec3(0.8, 0.8, 0.0)))); // Ground sphere
 
 		// Lambertian spheres
-		world.Add(new Sphere(new Vec3(0, 0, -1), 0.5, new Lambertian(new Vec3(0.1, 0.2, 0.5))));
+		world.Add(new Sphere(new Vec3(0, 0, -1.2), 0.5, new Lambertian(new Vec3(0.1, 0.2, 0.5))));
 
 		// Metal spheres
-		world.Add(new Sphere(new Vec3(-1.0, 0.0, -1.0), 0.5, new Dielectric(1.0 / 1.33))); // Left
 		world.Add(new Sphere(new Vec3(1.0, 0.0, -1.0), 0.5, new Metal(new Vec3(0.8, 0.6, 0.2), 1.0))); // Right
+
+		// Dielectric spheres
+			// Hollow glass sphere
+		world.Add(new Sphere(new Vec3(-1.0, 0.0, -1.0), 0.5, new Dielectric(1.5))); // Left outer
+		world.Add(new Sphere(new Vec3(-1.0, 0.0, -1.0), 0.4, new Dielectric(1.0 / 1.5))); // Left inner
 
 		return world;
 	}
