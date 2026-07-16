@@ -21,13 +21,15 @@ class Program
 
 		Camera camera = new(
 			16.0 / 9.0,				// Aspect ratio
-			400,					// Render width
+			1280,					// Render width
 			100,					// Samples per pixel
 			100,					// Max depth (number of bounces for rays)
-			90,						// Vertical field of view
-			new(0, 0, 0),		// Camera position.
-			new(0, 0, -1),		// Look at point.
-			new(0, 1, 0)		// Up vector.
+			40,						// Vertical field of view
+			new(-2, 2, 1),			// Camera position.
+			new(0, 0, -1),			// Look at point.
+			new(0, 1, 0),			// Up vector.
+			10,						// Defocus Angle (for depth of field, 0 = no depth of field)
+			3.5						// Focus  distance (for depth of field)
 		);
 
 		// Do an initial render of the pixel buffer to initialize the camera.

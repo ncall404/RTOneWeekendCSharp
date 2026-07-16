@@ -2,6 +2,7 @@
 
 using SDL3;
 using RTOneWeekend.Geometry;
+using System.ComponentModel.Design;
 
 namespace RTOneWeekend.Core;
 
@@ -18,13 +19,18 @@ public class Camera
 	public Vec3 LookAt = new(0, 0, -1); // Point the camera is looking at. TODO: Replace later with ViewDirection.
 	public Vec3 Up = new(0, 1, 0); // Camera-relatvie up direction.
 
+	public double DefocusAngle = 0; // Variation angle of rays through each pixel. 0 = no depth of field.
+	public double FocusDistance = 10; // Distance from the camera to the plane of perfect focus.
+
 	private double PixelSamplesScale; // Color scale factor for a sum of pixel samples.
 	private Vec3 Pixel00Location; // Location of the lower left pixel.
 	private Vec3 PixelDeltaU; // Offset to the pixel to the right.
 	private Vec3 PixelDeltaV; // Offset to the pixel below.
 	private Vec3 u, v, w; // Camera frame basis vectors. (u = pointing right, camera right, v = pointing camera up, w = pointing opposite the view direction)
+	private Vec3 DefocusDiskU; // Defocus disk horizontal radius.
+	private Vec3 DefocusDiskV; // Defocus disk vertical radius.
 
-	public Camera(double aspectRatio, int width, int samplesPerPixel, int maxDepth, double verticalFOV, Vec3 cameraPosition, Vec3 lookAt, Vec3 up)
+	public Camera(double aspectRatio, int width, int samplesPerPixel, int maxDepth, double verticalFOV, Vec3 cameraPosition, Vec3 lookAt, Vec3 up, double defocusAngle, double focusDistance)
 	{
 		AspectRatio = aspectRatio;
 		Width = width;
@@ -34,6 +40,8 @@ public class Camera
 		CameraPosition = cameraPosition;
 		LookAt = lookAt;
 		Up = up;
+		DefocusAngle = defocusAngle;
+		FocusDistance = focusDistance;
 
 		CalculateViewport(); // Calculate the viewport based on the camera settings.
 	}
@@ -90,10 +98,10 @@ public class Camera
 		PixelSamplesScale = 1.0 / SamplesPerPixel;
 
 		// Determine viewport dimensions.
-		double focalLength = (CameraPosition - LookAt).Length();
+		// double focalLength = (CameraPosition - LookAt).Length();
 		double theta = ConvertUnit.DegreesToRadians(VerticalFOV);
 		double h = Math.Tan(theta/2);
-        double viewportHeight = 2.0 * h * focalLength;
+        double viewportHeight = 2.0 * h * FocusDistance;
         double viewportWidth = viewportHeight * (Width / (double)Height);
 
 		// Calculate the u, v, w unit basis vectors for the camera coordinate frame.
@@ -110,8 +118,13 @@ public class Camera
         PixelDeltaV = viewportV / Height;
 
 		// Calculate the location of the upper left pixel of the viewport.
-        Vec3 viewportUpperLeft = CameraPosition - (focalLength * w) - viewportU/2 - viewportV/2;
+        Vec3 viewportUpperLeft = CameraPosition - (FocusDistance * w) - viewportU/2 - viewportV/2;
 		Pixel00Location = viewportUpperLeft + 0.5 * (PixelDeltaU + PixelDeltaV);
+
+		// Calculate the camera defocus (DOF) disk basis vectors.
+		double defocusRadius = FocusDistance * Math.Tan(ConvertUnit.DegreesToRadians(DefocusAngle / 2));
+		DefocusDiskU = u * defocusRadius;
+		DefocusDiskV = v * defocusRadius;
 	}
 
 	private Ray GetRay(int x, int y)
@@ -120,7 +133,7 @@ public class Camera
 		Vec3 offset = SampleSquare();
 		Vec3 pixelSample = Pixel00Location + ((x + offset.X) * PixelDeltaU) + ((y + offset.Y) * PixelDeltaV);
 
-		Vec3 rayOrigin = CameraPosition;
+		Vec3 rayOrigin = (DefocusAngle <= 0) ? CameraPosition : DefocusDiskSample();
 		Vec3 rayDirection = pixelSample - rayOrigin;
 
 		return new Ray(rayOrigin, rayDirection);
@@ -129,6 +142,13 @@ public class Camera
 	private Vec3 SampleSquare() {
 		// Returns the vector to a random point in the [-.5, -.5] - [+.5, +.5] unit square.
 		return new Vec3(RandomNum.RandomDouble() - 0.5, RandomNum.RandomDouble() - 0.5, 0);
+	}
+
+	private Vec3 DefocusDiskSample()
+	{
+		// Returns a random point in the camera defocus disk for DOF.
+		Vec3 p = Vec3.RandomInUnitDisk();
+		return CameraPosition + (p.X * DefocusDiskU) + (p.Y * DefocusDiskV);
 	}
 
 	private static Vec3 RayColor(Ray r, int depth, Hittable world)
