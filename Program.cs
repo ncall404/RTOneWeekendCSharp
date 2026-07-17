@@ -37,15 +37,7 @@ class Program
 		SDL.SetRenderDrawColor(renderer, 0, 150, 0, 255); // Set render draw color for debug text.
 
         // Streaming texture for pixel data with 4 bytes per pixel (RGBA8888)
-        var texture = SDL.CreateTexture(renderer, SDL.PixelFormat.RGBA8888, SDL.TextureAccess.Streaming, camera.Width, camera.Height);
-        if (texture == IntPtr.Zero)
-        {
-            SDL.LogError(SDL.LogCategory.Error, $"Texture creation failed: {SDL.GetError()}");
-            SDL.DestroyRenderer(renderer);
-            SDL.DestroyWindow(window);
-            return;
-        }
-		SDL.SetTextureScaleMode(texture, SDL.ScaleMode.Nearest); // Set the texture to the correct scaling mode to not be blurry if the window is a higher resolution.
+        nint texture = CreateRenderTexture(renderer, window, camera);
 
 
 
@@ -113,6 +105,12 @@ class Program
 			if (Settings.RealTimeRender || sceneChanged)
 			{
 				camera.CalculateViewport();
+				if (sceneChanged)
+				{
+					// Recreate the texture if a different scene is loaded.
+					SDL.DestroyTexture(texture);
+					texture = CreateRenderTexture(renderer, window, camera);
+				}
 				UpdateTextureRender(camera, world, texture);
 
 				if (!Settings.RealTimeRender)
@@ -154,6 +152,7 @@ class Program
         SDL.Quit();
     }
 
+	// Renders the viewport image of the camera and updates the texture with the rendered image.
 	private static void UpdateTextureRender(Camera camera, HittableList world, nint texture)
 	{
 		byte[] pixelBuffer = camera.Render(world);
@@ -164,6 +163,20 @@ class Program
 			Marshal.Copy(pixelBuffer, 0, pixelsPtr, pixelBuffer.Length);
 			SDL.UnlockTexture(texture);
 		}
+	}
+
+	// Creates and validates the render texture that is displayed in the window.
+	private static nint CreateRenderTexture(nint renderer, nint window, Camera camera)
+	{
+		nint texture = SDL.CreateTexture(renderer, SDL.PixelFormat.RGBA8888, SDL.TextureAccess.Streaming, camera.Width, camera.Height);
+        if (texture == IntPtr.Zero)
+        {
+            SDL.LogError(SDL.LogCategory.Error, $"Texture creation failed: {SDL.GetError()}");
+            SDL.DestroyRenderer(renderer);
+            SDL.DestroyWindow(window);
+        }
+		SDL.SetTextureScaleMode(texture, SDL.ScaleMode.Nearest); // Set the texture to the correct scaling mode to not be blurry if the window is a higher resolution.
+		return texture;
 	}
 
 	// Scene Loading Functions ========================================================================= TODO: Make an actual scene loader class at some point.
