@@ -11,4 +11,7 @@ public static class Settings
 	public static int WindowWidth { get; set; } = 1280;
 	public static int WindowHeight { get; set; } = 720;
 
+	// Currently selected scene.
+	public static int NumScenes {get;} = 2;
+	public static int SelectedScene {get; set;} = 1;
 }
