@@ -267,7 +267,7 @@ class Program
 		camera = new(
 			16.0 / 9.0,				// Aspect ratio
 			1280,					// Render width
-			100,					// Samples per pixel
+			30,						// Samples per pixel
 			50,						// Max depth (number of bounces for rays)
 			20,						// Vertical field of view
 			new(13, 2, 3),			// Camera position.
