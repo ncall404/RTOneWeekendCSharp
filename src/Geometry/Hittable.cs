@@ -1,5 +1,6 @@
 // Hitrecord struct and Hittable abstract class for representing objects intersectable by rays in the raytracing.
 
+using System.Runtime.CompilerServices;
 using RTOneWeekend.Core;
 using RTOneWeekend.Materials;
 
@@ -15,6 +16,7 @@ public ref struct HitRecord
 	public bool FrontFace;
 
 	// Sets the HitRecord normal vector based on if the ray is inside or outside of the hittable object.
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	public void SetFaceNormal(in Ray r, in Vec3 outwardNormal)
 	{
 		FrontFace = Vec3.Dot(r.Direction, outwardNormal) < 0;

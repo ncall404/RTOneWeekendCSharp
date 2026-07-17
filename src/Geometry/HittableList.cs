@@ -1,5 +1,6 @@
 // Class for storing a list of hittable objects.
 
+using System.Runtime.CompilerServices;
 using RTOneWeekend.Core;
 
 namespace RTOneWeekend.Geometry;
@@ -14,8 +15,10 @@ public class HittableList : Hittable
 		Add(obj);
 	}
 
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	public void Clear() => Objects.Clear();
 
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	public void Add(Hittable obj) => Objects.Add(obj);
 
 	public override bool Hit(in Ray r, Interval rayT, ref HitRecord rec)

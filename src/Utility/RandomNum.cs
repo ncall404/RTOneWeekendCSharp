@@ -1,5 +1,7 @@
 // A static class containing useful utility functions and variables for getting random numbers.
 
+using System.Runtime.CompilerServices;
+
 namespace RTOneWeekend.Utility;
 
 public static class RandomNum
@@ -10,12 +12,14 @@ public static class RandomNum
 	private static Random ThreadRandom => _threadRandom ??= new Random();
 
 	// Random double from 0 to 1.
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	public static double RandomDouble()
 	{
 		return ThreadRandom.NextDouble();
 	}
 
 	// Random double from min to max.
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	public static double RandomDouble(double min, double max)
 	{
 		return min + (max - min) * RandomDouble();

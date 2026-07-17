@@ -1,5 +1,7 @@
 // A class representing an interval of doubles (min, max).
 
+using System.Runtime.CompilerServices;
+
 namespace RTOneWeekend.Utility;
 
 public class Interval
@@ -20,12 +22,16 @@ public class Interval
 		Max = max;
 	}
 
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	public double Size() => Max - Min;
 
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	public bool Contains(double x) => Min <= x && x <= Max;
 
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	public bool Surrounds(double x) => Min < x && x < Max;
 
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	public double Clamp(double x)
 	{
 		return Math.Clamp(x, Min, Max);
