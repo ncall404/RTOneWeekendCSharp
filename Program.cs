@@ -81,7 +81,7 @@ class Program
 					Settings.RealTimeRender = !Settings.RealTimeRender;
 				}
 				// Changes what scene is being rendered.
-					// Next scene
+					// Increase selected scene number
 				else if (e.Type == (uint)SDL.EventType.KeyDown && e.Key.Key == SDL.Keycode.Right)
 				{
 					if (Settings.SelectedScene < Settings.NumScenes)
@@ -90,7 +90,7 @@ class Program
 						Console.WriteLine("Selected scene: " + Settings.SelectedScene);
 					}
 				}
-					// Previous scene
+					// Decrease selected scene number
 				else if (e.Type == (uint)SDL.EventType.KeyDown && e.Key.Key == SDL.Keycode.Left)
 				{
 					if (Settings.SelectedScene > 1)
