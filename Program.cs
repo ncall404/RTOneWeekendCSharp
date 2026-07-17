@@ -20,7 +20,7 @@ class Program
 		HittableList world;
 		Camera camera;
 
-		SceneLoader(out world, out camera); // Load the initial scene.
+		(world, camera) = SceneLoader(); // Load the initial scene.
 		bool sceneChanged = true; // Bool to track if the selected scene has changed and needs a rerender even in non-realtime mode.
 
         if (!SDL.Init(SDL.InitFlags.Video))
@@ -97,7 +97,7 @@ class Program
 					if (Settings.SelectedScene >= 1 && Settings.SelectedScene <= Settings.NumScenes)
 					{
 						sceneChanged = true;
-						SceneLoader(out world, out camera);
+						(world, camera) = SceneLoader();
 					}
 				}
             }
@@ -181,18 +181,27 @@ class Program
 
 	// Scene Loading Functions ========================================================================= TODO: Make an actual scene loader class at some point.
 
-	private static void SceneLoader(out HittableList world, out Camera camera)
+	private static (HittableList, Camera) SceneLoader()
 	{
-		world = Settings.SelectedScene switch
+		HittableList world;
+		Camera camera;
+		switch (Settings.SelectedScene)
 		{
-			1 => LoadScene1(out camera),
-			2 => LoadScene2(out camera),
-			_ => LoadScene1(out camera),
-		};
+			case 1:
+				(world, camera) = LoadScene1();
+				break;
+			case 2:
+				(world, camera) = LoadScene2();
+				break;
+			default:
+				(world, camera) = LoadScene1();
+				break;
+		}
+		return (world, camera);
 	}
 
 	// This creates the scene from book 1 with 3 balls of different materials.
-	private static HittableList LoadScene1(out Camera camera)
+	private static (HittableList, Camera) LoadScene1()
 	{
 		HittableList world = new(new Sphere(new(0, -100.5, -1), 100, new Lambertian(new Vec3(0.8, 0.8, 0.0)))); // Ground sphere
 
@@ -207,7 +216,7 @@ class Program
 		world.Add(new Sphere(new(-1.0, 0.0, -1.0), 0.5, new Dielectric(1.5))); // Left outer
 		world.Add(new Sphere(new(-1.0, 0.0, -1.0), 0.4, new Dielectric(1.0 / 1.5))); // Left inner
 
-		camera = new(
+		Camera camera = new(
 			16.0 / 9.0,				// Aspect ratio
 			1280,					// Render width
 			100,					// Samples per pixel
@@ -222,11 +231,11 @@ class Program
 
 		Console.WriteLine("Scene 1 Loaded");
 
-		return world;
+		return (world, camera);
 	}
 
 	// This creates the scene from book 1 that is used for the final render.
-	private static HittableList LoadScene2(out Camera camera)
+	private static (HittableList, Camera) LoadScene2()
 	{
 		HittableList world = new();
 
@@ -277,7 +286,7 @@ class Program
 		Material mat3 = new Metal(new(0.7, 0.6, 0.5), 0.0);
 		world.Add(new Sphere(new(4, 1, 0), 1.0, mat3));
 
-		camera = new(
+		Camera camera = new(
 			16.0 / 9.0,				// Aspect ratio
 			1280,					// Render width
 			30,						// Samples per pixel
@@ -292,6 +301,6 @@ class Program
 
 		Console.WriteLine("Scene 2 Loaded");
 
-		return world;
+		return (world, camera);
 	}
 }
