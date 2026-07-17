@@ -111,10 +111,16 @@ class Program
 					SDL.DestroyTexture(texture);
 					texture = CreateRenderTexture(renderer, window, camera);
 				}
+
+				ulong startTime = SDL.GetTicks();
 				UpdateTextureRender(camera, world, texture);
+				ulong endTime = SDL.GetTicks();
 
 				if (!Settings.RealTimeRender)
+				{
+					Console.WriteLine($"Render time: {endTime - startTime}ms");
 					sceneChanged = false;
+				}
 			}
 			
 
