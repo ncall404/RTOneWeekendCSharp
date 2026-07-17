@@ -10,7 +10,7 @@ It can be set to a real-time mode but there is no movement to take advantage of 
 I plan on following the books further and doing independant improvements and optimizations on it too.
 
 ## Controls
-1 - Toggle Anti-Aliasing (The anti-aliasing is just multiple rays per pixel in it's current state, quite expensive.)
+1 - Toggle Anti-Aliasing (The anti-aliasing is just multiple rays per pixel in it's current state, quite expensive. Will auto-rerender if not in real-time mode.)
 
 2 - Toggle Real-Time Rendering (Repeatedly renders the scene as fast as it can, displays performance in FPS and MS per frame. Pretty slow right now.)
 
@@ -21,3 +21,8 @@ Right Arrow - Increase selected scene number.
 Down Arrow - Load selected scene and render it.
 
 Escape - Quit the program.
+
+## Rendering Settings
+Rendering scenes are set up to be scene dependent for now since there are different performance requirements for each one. To change the settings, go to the bottom of the function labelled LoadScene# where # is the number of the scene you want to change the settings for. The current set values are for renders to complete within a short time (under 10 seconds scene 1, under 2 minutes scene 2) on my Ryzen 7 9700x. If you have a lower end CPU or want to view the scenes in the real-time mode, then I recommend lowering the quality.
+
+Currently only scene 1 is really fit for real-time and that is with anti-aliasing disabled at a lower resolution. For instance, with scene 1 set to 640p width and with anti-aliasing off, I get a framerate of about 111 FPS on my Ryzen 7 9700x.
