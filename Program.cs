@@ -17,23 +17,11 @@ class Program
     static void Main(string[] args)
     {
 		// Create the initial scene.
-		HittableList world = InitializeScene();
+		HittableList world;
+		Camera camera;
 
-		Camera camera = new(
-			16.0 / 9.0,				// Aspect ratio
-			1280,					// Render width
-			100,					// Samples per pixel
-			100,					// Max depth (number of bounces for rays)
-			40,						// Vertical field of view
-			new(-2, 2, 1),			// Camera position.
-			new(0, 0, -1),			// Look at point.
-			new(0, 1, 0),			// Up vector.
-			10,						// Defocus Angle (for depth of field, 0 = no depth of field)
-			3.5						// Focus  distance (for depth of field)
-		);
-
-		// Do an initial render of the pixel buffer to initialize the camera.
-		// camera.Render(world);
+		SceneLoader(out world, out camera); // Load the initial scene.
+		bool sceneChanged = true; // Bool to track if the selected scene has changed and needs a rerender even in non-realtime mode.
 
         if (!SDL.Init(SDL.InitFlags.Video))
         {
@@ -59,8 +47,7 @@ class Program
         }
 		SDL.SetTextureScaleMode(texture, SDL.ScaleMode.Nearest); // Set the texture to the correct scaling mode to not be blurry if the window is a higher resolution.
 
-		// Do initial render to the texture.
-		UpdateTextureRender(camera, world, texture);
+
 
 		// Peformance monitoring variables for loop.
 		ulong lastCounter = SDL.GetTicks();
@@ -86,22 +73,50 @@ class Program
 				else if (e.Type == (uint)SDL.EventType.KeyDown && e.Key.Key == SDL.Keycode.Alpha1)
 				{
 					Settings.AntiAliasing = !Settings.AntiAliasing;
-					if (!Settings.RealTimeRender)
-					{
-						UpdateTextureRender(camera, world, texture);
-					}
+					sceneChanged = true;
 				}
 				// Toggles real-time rendering on/off.
 				else if (e.Type == (uint)SDL.EventType.KeyDown && e.Key.Key == SDL.Keycode.Alpha2)
 				{
 					Settings.RealTimeRender = !Settings.RealTimeRender;
 				}
+				// Changes what scene is being rendered.
+					// Next scene
+				else if (e.Type == (uint)SDL.EventType.KeyDown && e.Key.Key == SDL.Keycode.Right)
+				{
+					if (Settings.SelectedScene < Settings.NumScenes)
+					{
+						Settings.SelectedScene++;
+						Console.WriteLine("Selected scene: " + Settings.SelectedScene);
+					}
+				}
+					// Previous scene
+				else if (e.Type == (uint)SDL.EventType.KeyDown && e.Key.Key == SDL.Keycode.Left)
+				{
+					if (Settings.SelectedScene > 1)
+					{
+						Settings.SelectedScene--;
+						Console.WriteLine("Selected scene: " + Settings.SelectedScene);
+					}
+				}
+					// Load selected scene
+				else if (e.Type == (uint)SDL.EventType.KeyDown && e.Key.Key == SDL.Keycode.Down)
+				{
+					if (Settings.SelectedScene >= 1 && Settings.SelectedScene <= Settings.NumScenes)
+					{
+						sceneChanged = true;
+						SceneLoader(out world, out camera);
+					}
+				}
             }
 
-			if (Settings.RealTimeRender)
+			if (Settings.RealTimeRender || sceneChanged)
 			{
 				camera.CalculateViewport();
 				UpdateTextureRender(camera, world, texture);
+
+				if (!Settings.RealTimeRender)
+					sceneChanged = false;
 			}
 			
 
@@ -139,28 +154,11 @@ class Program
         SDL.Quit();
     }
 
-	// Creates the initial scene.
-	private static HittableList InitializeScene()
-	{
-		HittableList world = new(new Sphere(new Vec3(0, -100.5, -1), 100, new Lambertian(new Vec3(0.8, 0.8, 0.0)))); // Ground sphere
-
-		// Lambertian spheres
-		world.Add(new Sphere(new Vec3(0, 0, -1.2), 0.5, new Lambertian(new Vec3(0.1, 0.2, 0.5))));
-
-		// Metal spheres
-		world.Add(new Sphere(new Vec3(1.0, 0.0, -1.0), 0.5, new Metal(new Vec3(0.8, 0.6, 0.2), 1.0))); // Right
-
-		// Dielectric spheres
-			// Hollow glass sphere
-		world.Add(new Sphere(new Vec3(-1.0, 0.0, -1.0), 0.5, new Dielectric(1.5))); // Left outer
-		world.Add(new Sphere(new Vec3(-1.0, 0.0, -1.0), 0.4, new Dielectric(1.0 / 1.5))); // Left inner
-
-		return world;
-	}
-
 	private static void UpdateTextureRender(Camera camera, HittableList world, nint texture)
 	{
+		Console.WriteLine("Rendering scene...");
 		byte[] pixelBuffer = camera.Render(world);
+		Console.WriteLine("Done rendering!");
 		IntPtr pixelsPtr = IntPtr.Zero;
         int pitch = 0;
 		if (SDL.LockTexture(texture, IntPtr.Zero, out pixelsPtr, out pitch))
@@ -168,5 +166,121 @@ class Program
 			Marshal.Copy(pixelBuffer, 0, pixelsPtr, pixelBuffer.Length);
 			SDL.UnlockTexture(texture);
 		}
+	}
+
+	// Scene Loading Functions ========================================================================= TODO: Make an actual scene loader class at some point.
+
+	private static void SceneLoader(out HittableList world, out Camera camera)
+	{
+		world = Settings.SelectedScene switch
+		{
+			1 => LoadScene1(out camera),
+			2 => LoadScene2(out camera),
+			_ => LoadScene1(out camera),
+		};
+	}
+
+	// This creates the scene from book 1 with 3 balls of different materials.
+	private static HittableList LoadScene1(out Camera camera)
+	{
+		HittableList world = new(new Sphere(new(0, -100.5, -1), 100, new Lambertian(new Vec3(0.8, 0.8, 0.0)))); // Ground sphere
+
+		// Lambertian spheres
+		world.Add(new Sphere(new(0, 0, -1.2), 0.5, new Lambertian(new Vec3(0.1, 0.2, 0.5))));
+
+		// Metal spheres
+		world.Add(new Sphere(new(1.0, 0.0, -1.0), 0.5, new Metal(new Vec3(0.8, 0.6, 0.2), 1.0))); // Right
+
+		// Dielectric spheres
+			// Hollow glass sphere
+		world.Add(new Sphere(new(-1.0, 0.0, -1.0), 0.5, new Dielectric(1.5))); // Left outer
+		world.Add(new Sphere(new(-1.0, 0.0, -1.0), 0.4, new Dielectric(1.0 / 1.5))); // Left inner
+
+		camera = new(
+			16.0 / 9.0,				// Aspect ratio
+			1280,					// Render width
+			100,					// Samples per pixel
+			100,					// Max depth (number of bounces for rays)
+			40,						// Vertical field of view
+			new(-2, 2, 1),			// Camera position.
+			new(0, 0, -1),			// Look at point.
+			new(0, 1, 0),			// Up vector.
+			10,						// Defocus Angle (for depth of field, 0 = no depth of field)
+			3.5						// Focus  distance (for depth of field)
+		);
+
+		Console.WriteLine("Scene 1 Loaded");
+
+		return world;
+	}
+
+	// This creates the scene from book 1 that is used for the final render.
+	private static HittableList LoadScene2(out Camera camera)
+	{
+		HittableList world = new();
+
+		Lambertian matGround = new Lambertian(new Vec3(0.5, 0.5, 0.5));
+		world.Add(new Sphere(new(0, -1000, 0), 1000, matGround));
+
+		for (int a = -11; a < 11; a++)
+		{
+			for (int b = -11; b < 11; b++)
+			{
+				double chooseMat = RandomNum.RandomDouble();
+				Vec3 center = new(a + 0.9*RandomNum.RandomDouble(), 0.2, b + 0.9*RandomNum.RandomDouble());
+
+				if ((center - new Vec3(4, 0.2, 0)).Length() > 0.9)
+				{
+					Material matSphere;
+
+					if (chooseMat < 0.8)
+					{
+						// Diffuse
+						Vec3 albedo = Vec3.Random() * Vec3.Random();
+						matSphere = new Lambertian(albedo);
+						world.Add(new Sphere(center, 0.2, matSphere));
+					}
+					else if (chooseMat < 0.95)
+					{
+						// Metal
+						Vec3 albedo = Vec3.Random(0.5, 1);
+						double fuzz = RandomNum.RandomDouble(0, 0.5);
+						matSphere = new Metal(albedo, fuzz);
+						world.Add(new Sphere(center, 0.2, matSphere));
+					}
+					else
+					{
+						// Glass
+						matSphere = new Dielectric(1.5);
+						world.Add(new Sphere(center, 0.2, matSphere));
+					}
+				}
+			}
+		}
+		Material mat1 = new Dielectric(1.5);
+		world.Add(new Sphere(new(0, 1, 0), 1.0, mat1));
+
+		Material mat2 = new Lambertian(new(0.4, 0.2, 0.1));
+		world.Add(new Sphere(new(-4, 1, 0), 1.0, mat2));
+
+		Material mat3 = new Metal(new(0.7, 0.6, 0.5), 0.0);
+		world.Add(new Sphere(new(4, 1, 0), 1.0, mat3));
+
+		camera = new(
+			16.0 / 9.0,				// Aspect ratio
+			1280,					// Render width
+			100,					// Samples per pixel
+			50,						// Max depth (number of bounces for rays)
+			20,						// Vertical field of view
+			new(13, 2, 3),			// Camera position.
+			new(0, 0, 0),			// Look at point.
+			new(0, 1, 0),			// Up vector.
+			0.6,					// Defocus Angle (for depth of field, 0 = no depth of field)
+			10.0					// Focus  distance (for depth of field)
+		);
+
+		Console.WriteLine("Scene 2 Loaded");
+
+		return world;
 	}
 }
