@@ -156,9 +156,7 @@ class Program
 
 	private static void UpdateTextureRender(Camera camera, HittableList world, nint texture)
 	{
-		Console.WriteLine("Rendering scene...");
 		byte[] pixelBuffer = camera.Render(world);
-		Console.WriteLine("Done rendering!");
 		IntPtr pixelsPtr = IntPtr.Zero;
         int pitch = 0;
 		if (SDL.LockTexture(texture, IntPtr.Zero, out pixelsPtr, out pitch))
