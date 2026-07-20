@@ -24,4 +24,11 @@ public static class RandomNum
 	{
 		return min + (max - min) * RandomDouble();
 	}
+
+	// Random int from min to max.
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static int RandomInt(int min, int max)
+	{
+		return ThreadRandom.Next(min, max);
+	}
 }
