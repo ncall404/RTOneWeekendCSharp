@@ -15,6 +15,22 @@ public readonly struct Vec3(double x, double y, double z)
 	public double G => Y;
 	public double B => Z;
 
+	// Indexer (Allows access to X, Y, and Z with [0], [1], [2])
+	public double this[int index]
+	{
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		get
+		{
+			return index switch
+			{
+				0 => X,
+				1 => Y,
+				2 => Z,
+				_ => throw new IndexOutOfRangeException()
+			};
+		}
+	}
+
 	// Operators
 		// Unary
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
