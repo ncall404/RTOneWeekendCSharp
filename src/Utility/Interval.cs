@@ -37,6 +37,14 @@ public class Interval
 		return Math.Clamp(x, Min, Max);
 	}
 
+	// Pad an interval by a given amount (delta).
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public Interval Expand(double delta)
+	{
+		double padding = delta/2;
+		return new(Min - padding, Max + padding);
+	}
+
 	public static readonly Interval Empty = new();
 	public static readonly Interval Universe = new(double.NegativeInfinity, double.PositiveInfinity);
 }
