@@ -22,6 +22,13 @@ public class Interval
 		Max = max;
 	}
 
+	// Create the interval that tightly surrounds two input intervals.
+	public Interval(Interval a, Interval b)
+	{
+		Min = a.Min <= b.Min ? a.Min : b.Min;
+		Max = a.Max >= b.Max ? a.Max : b.Max;
+	}
+
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	public double Size() => Max - Min;
 
