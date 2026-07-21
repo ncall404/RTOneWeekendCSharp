@@ -13,9 +13,9 @@ public readonly struct Aabb
 	// The default AABB is empty, since intervals are empty by default.
 	public Aabb()
 	{
-		X = new();
-		Y = new();
-		Z = new();
+		X = Interval.Empty;
+		Y = Interval.Empty;
+		Z = Interval.Empty;
 	}
 
 	public Aabb(Interval x, Interval y, Interval z)
