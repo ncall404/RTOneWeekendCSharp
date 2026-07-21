@@ -1,5 +1,7 @@
 # C-Sharp - RayTracing In One Weekend
 
+### !!! This branch is the renderer up to the end of book 1 !!!
+
 ## About The Project
 Follows book one of the [Ray Tracing in One Weekend](https://raytracing.github.io) series but written in C#.
 
