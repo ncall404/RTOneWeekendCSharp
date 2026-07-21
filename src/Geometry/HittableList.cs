@@ -9,6 +9,8 @@ public class HittableList : Hittable
 {
 	public List<Hittable> Objects {get;} = [];
 
+	public override Aabb BoundingBox { get; protected set; } // Bounding box for all the objects in the list.
+
 	public HittableList() {}
 	public HittableList(Hittable obj)
 	{
@@ -19,7 +21,12 @@ public class HittableList : Hittable
 	public void Clear() => Objects.Clear();
 
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
-	public void Add(Hittable obj) => Objects.Add(obj);
+	public void Add(Hittable obj) 
+	{
+		Objects.Add(obj);
+		// Create the bounding box
+		BoundingBox = Objects.Count == 1 ? obj.BoundingBox : new Aabb(BoundingBox, obj.BoundingBox);
+	}
 
 	public override bool Hit(in Ray r, Interval rayT, ref HitRecord rec)
 	{
