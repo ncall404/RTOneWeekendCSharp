@@ -4,7 +4,7 @@ using System.Runtime.CompilerServices;
 
 namespace RTOneWeekend.Utility;
 
-public class Interval
+public struct Interval
 {
 	public double Min;
 	public double Max;
