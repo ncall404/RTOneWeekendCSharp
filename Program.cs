@@ -292,6 +292,8 @@ class Program
 		Material mat3 = new Metal(new(0.7, 0.6, 0.5), 0.0);
 		world.Add(new Sphere(new(4, 1, 0), 1.0, mat3));
 
+		world = new HittableList(new BvhNode(world));
+
 		Camera camera = new(
 			16.0 / 9.0,				// Aspect ratio
 			700,					// Render width
