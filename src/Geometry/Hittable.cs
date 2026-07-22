@@ -13,6 +13,8 @@ public ref struct HitRecord
 	public Material Material;
 	public double RayHitDistance; // Distance from ray origin to hit point; also known as t in the tutorial.
 
+	public double U, V; // UV coordinates for texturing.
+
 	public bool FrontFace;
 
 	// Sets the HitRecord normal vector based on if the ray is inside or outside of the hittable object.
