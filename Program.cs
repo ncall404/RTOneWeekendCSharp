@@ -73,6 +73,11 @@ class Program
 				{
 					Settings.RealTimeRender = !Settings.RealTimeRender;
 				}
+				// Toggles debug text on/off.
+				else if (e.Type == (uint)SDL.EventType.KeyDown && e.Key.Key == SDL.Keycode.H)
+				{
+					Settings.HideDebugText = !Settings.HideDebugText;
+				}
 				// Changes what scene is being rendered.
 					// Increase selected scene number
 				else if (e.Type == (uint)SDL.EventType.KeyDown && e.Key.Key == SDL.Keycode.Right)
@@ -146,11 +151,20 @@ class Program
 					frameCount = 0f;
 					lastCounter = currentCounter;
 				}
-				SDL.RenderDebugText(renderer, 5, 25, $"fps: {currentFps:F2}");
-				SDL.RenderDebugText(renderer, 5, 35, $"ms: {frameTime:F2}");
 			}
-			SDL.RenderDebugText(renderer, 5, 5, $"Selected Scene: {Settings.SelectedScene} / {Settings.NumScenes}");
-			SDL.RenderDebugText(renderer, 5, 15, $"Loaded Scene: {Settings.LoadedScene} / {Settings.NumScenes}");
+
+			// Display debug text if it isn't hidden.
+			if (!Settings.HideDebugText)
+			{
+				if (Settings.RealTimeRender)
+				{
+					SDL.RenderDebugText(renderer, 5, 25, $"fps: {currentFps:F2}");
+					SDL.RenderDebugText(renderer, 5, 35, $"ms: {frameTime:F2}");
+				}
+				SDL.RenderDebugText(renderer, 5, 5, $"Selected Scene: {Settings.SelectedScene} / {Settings.NumScenes}");
+				SDL.RenderDebugText(renderer, 5, 15, $"Loaded Scene: {Settings.LoadedScene} / {Settings.NumScenes}");
+			}
+			
 
             SDL.RenderPresent(renderer);
         }
