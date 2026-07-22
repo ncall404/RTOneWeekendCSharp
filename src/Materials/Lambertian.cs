@@ -2,13 +2,15 @@
 
 using RTOneWeekend.Core;
 using RTOneWeekend.Geometry;
+using RTOneWeekend.Textures;
 
 namespace RTOneWeekend.Materials;
 
 class Lambertian : Material
 {
-	private Vec3 Albedo;
-	public Lambertian(Vec3 albedo) => Albedo = albedo;
+	private Texture Tex;
+	public Lambertian(Vec3 albedo) => Tex = new SolidColor(albedo);
+	public Lambertian(Texture texture) => Tex = texture;
 
 	public override bool Scatter(Ray rayIn, HitRecord rec, out Vec3 attenuation, out Ray scattered)
 	{
@@ -19,7 +21,7 @@ class Lambertian : Material
 			scatterDirection = rec.Normal;
 
 		scattered = new Ray(rec.P, scatterDirection);
-		attenuation = Albedo;
+		attenuation = Tex.Value(rec.U, rec.V, rec.P);
 		return true;
 	}
 }
