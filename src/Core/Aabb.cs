@@ -78,4 +78,20 @@ public readonly struct Aabb
 		}
 		return true;
 	}
+
+	// Returns the index of the longest axis of the bounding box.
+	public int LongestAxis()
+	{
+		if (X.Size() > Y.Size())
+		{
+			return X.Size() > Z.Size() ? 0 : 2;
+		}
+		else
+		{
+			return Y.Size() > Z.Size() ? 1 : 2;
+		}
+	}
+
+	public static readonly Aabb Empty = new();
+	public static readonly Aabb Universe = new(Interval.Universe, Interval.Universe, Interval.Universe);
 }
