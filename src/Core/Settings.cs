@@ -13,5 +13,6 @@ public static class Settings
 
 	// Currently selected scene.
 	public static int NumScenes {get;} = 3;
-	public static int SelectedScene {get; set;} = 1;
+	public static int SelectedScene {get; set;} = 0;
+	public static int LoadedScene {get; set;} = 0;
 }

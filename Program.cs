@@ -69,7 +69,7 @@ class Program
 					sceneChanged = true;
 				}
 				// Toggles real-time rendering on/off.
-				else if (e.Type == (uint)SDL.EventType.KeyDown && e.Key.Key == SDL.Keycode.Alpha2)
+				else if (e.Type == (uint)SDL.EventType.KeyDown && e.Key.Key == SDL.Keycode.Alpha2 && Settings.SelectedScene > 0)
 				{
 					Settings.RealTimeRender = !Settings.RealTimeRender;
 				}
@@ -86,7 +86,7 @@ class Program
 					// Decrease selected scene number
 				else if (e.Type == (uint)SDL.EventType.KeyDown && e.Key.Key == SDL.Keycode.Left)
 				{
-					if (Settings.SelectedScene > 1)
+					if (Settings.SelectedScene > 0)
 					{
 						Settings.SelectedScene--;
 						Console.WriteLine("Selected scene: " + Settings.SelectedScene);
@@ -95,7 +95,7 @@ class Program
 					// Load selected scene
 				else if (e.Type == (uint)SDL.EventType.KeyDown && e.Key.Key == SDL.Keycode.Down)
 				{
-					if (Settings.SelectedScene >= 1 && Settings.SelectedScene <= Settings.NumScenes)
+					if (Settings.SelectedScene >= 0 && Settings.SelectedScene <= Settings.NumScenes)
 					{
 						sceneChanged = true;
 						(world, camera) = SceneLoader();
@@ -146,9 +146,11 @@ class Program
 					frameCount = 0f;
 					lastCounter = currentCounter;
 				}
-				SDL.RenderDebugText(renderer, 5, 5, $"fps: {currentFps:F2}");
-				SDL.RenderDebugText(renderer, 5, 15, $"ms: {frameTime:F2}");
+				SDL.RenderDebugText(renderer, 5, 25, $"fps: {currentFps:F2}");
+				SDL.RenderDebugText(renderer, 5, 35, $"ms: {frameTime:F2}");
 			}
+			SDL.RenderDebugText(renderer, 5, 5, $"Selected Scene: {Settings.SelectedScene} / {Settings.NumScenes}");
+			SDL.RenderDebugText(renderer, 5, 15, $"Loaded Scene: {Settings.LoadedScene} / {Settings.NumScenes}");
 
             SDL.RenderPresent(renderer);
         }
@@ -196,15 +198,21 @@ class Program
 		{
 			case 1:
 				(world, camera) = LoadScene1();
+				Settings.LoadedScene = 1;
 				break;
 			case 2:
 				(world, camera) = LoadScene2();
+				Settings.LoadedScene = 2;
 				break;
 			case 3:
 				(world, camera) = LoadScene3();
+				Settings.LoadedScene = 3;
 				break;
 			default:
-				(world, camera) = LoadScene1();
+				// Empty scene
+				(world, camera) = (new(), new(16.0/9.0, 10, 1, 1, 40, new(0, 0, 0), new(0, 0, -1), new(0, 1, 0)));
+				Settings.LoadedScene = 0;
+				Settings.RealTimeRender = false;
 				break;
 		}
 		return (world, camera);
