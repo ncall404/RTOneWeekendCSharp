@@ -15,11 +15,14 @@ public class BvhNode : Hittable
 
 	public BvhNode(List<Hittable> objects, int start, int end)
 	{
-		// NOTE: Sorting had to be done slightly differently to the tutorial due to language/library differences between C++ and C#.
+		// Build the bounding box of the span of source objects.
+		BoundingBox = Aabb.Empty;
+		for (int objectIndex = start; objectIndex < end; objectIndex++)
+			BoundingBox = new Aabb(BoundingBox, objects[objectIndex].BoundingBox);
 
 		int axis = RandomNum.RandomInt(0, 2);
 
-		// Do a comparison but get ints instead of bools so that the sort function can be used.
+		// Do a comparison but get ints instead of bools (which the tutorial uses) so that the List sort function can be used.
 		Comparison<Hittable> comparator = (axis == 0) ? BoxXCompare : (axis == 1) ? BoxYCompare : BoxZCompare;
 
 		int objectSpan = end - start;
@@ -35,13 +38,12 @@ public class BvhNode : Hittable
 		}
 		else
 		{
+			// NOTE: Sorting had to be done slightly differently to the tutorial due to language/library differences between C++ and C#.
 			objects.Sort(start, objectSpan, Comparer<Hittable>.Create(comparator)); // Create a comparer to act the same as std::sort in the tutorial.
 			int mid = start + objectSpan / 2;
 			Left = new BvhNode(objects, start, mid);
 			Right = new BvhNode(objects, mid, end);
 		}
-
-		BoundingBox = new Aabb(Left.BoundingBox, Right.BoundingBox);
 	}
 
 	public override bool Hit(in Ray r, Interval rayT, ref HitRecord rec)
