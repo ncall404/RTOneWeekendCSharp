@@ -8,6 +8,7 @@ using SDL3;
 using RTOneWeekend.Core;
 using RTOneWeekend.Geometry;
 using RTOneWeekend.Materials;
+using RTOneWeekend.Textures;
 
 namespace RTOneWeekend;
 
@@ -240,12 +241,12 @@ class Program
 		return (world, camera);
 	}
 
-	// This creates the scene from book 1 that is used for the final render.
+	// This creates the scene from book 1 that is used for the final render. Named "Bouncing Spheres" in book 2.
 	private static (HittableList, Camera) LoadScene2()
 	{
 		HittableList world = new();
 
-		Lambertian matGround = new Lambertian(new Vec3(0.5, 0.5, 0.5));
+		Lambertian matGround = new Lambertian(new CheckerTexture(0.32, new Vec3(0.2, 0.3, 0.1), new Vec3(0.9, 0.9, 0.9)));
 		world.Add(new Sphere(new(0, -1000, 0), 1000, matGround));
 
 		for (int a = -11; a < 11; a++)
@@ -286,7 +287,7 @@ class Program
 		Material mat1 = new Dielectric(1.5);
 		world.Add(new Sphere(new(0, 1, 0), 1.0, mat1));
 
-		Material mat2 = new Lambertian(new(0.4, 0.2, 0.1));
+		Material mat2 = new Lambertian(new Vec3(0.4, 0.2, 0.1));
 		world.Add(new Sphere(new(-4, 1, 0), 1.0, mat2));
 
 		Material mat3 = new Metal(new(0.7, 0.6, 0.5), 0.0);
