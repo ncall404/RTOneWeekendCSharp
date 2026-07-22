@@ -200,6 +200,9 @@ class Program
 			case 2:
 				(world, camera) = LoadScene2();
 				break;
+			case 3:
+				(world, camera) = LoadScene3();
+				break;
 			default:
 				(world, camera) = LoadScene1();
 				break;
@@ -309,6 +312,32 @@ class Program
 		);
 
 		Console.WriteLine("Scene 2 Loaded");
+
+		return (world, camera);
+	}
+
+	// Checkered spheres - book 2.
+	private static (HittableList, Camera) LoadScene3()
+	{
+		HittableList world = new();
+
+		CheckerTexture checker = new(0.32, new Vec3(0.2, 0.3, 0.1), new Vec3(0.9, 0.9, 0.9));
+
+		world.Add(new Sphere(new(0, -10, 0), 10, new Lambertian(checker)));
+		world.Add(new Sphere(new(0, 10, 0), 10, new Lambertian(checker)));
+
+		Camera camera = new(
+			16.0 / 9.0,				// Aspect ratio
+			700,					// Render width
+			50,						// Samples per pixel
+			50,						// Max depth (number of bounces for rays)
+			20,						// Vertical field of view
+			new(13, 2, 3),			// Camera position.
+			new(0, 0, 0),			// Look at point.
+			new(0, 1, 0)			// Up vector.
+		);
+
+		Console.WriteLine("Scene 3 Loaded");
 
 		return (world, camera);
 	}

@@ -30,7 +30,7 @@ public class Camera
 	private Vec3 DefocusDiskU; // Defocus disk horizontal radius.
 	private Vec3 DefocusDiskV; // Defocus disk vertical radius.
 
-	public Camera(double aspectRatio, int width, int samplesPerPixel, int maxDepth, double verticalFOV, Vec3 cameraPosition, Vec3 lookAt, Vec3 up, double defocusAngle, double focusDistance)
+	public Camera(double aspectRatio, int width, int samplesPerPixel, int maxDepth, double verticalFOV, Vec3 cameraPosition, Vec3 lookAt, Vec3 up, double defocusAngle = 0, double focusDistance = 10)
 	{
 		AspectRatio = aspectRatio;
 		Width = width;
