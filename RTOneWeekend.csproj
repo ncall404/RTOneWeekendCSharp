@@ -15,4 +15,10 @@
     <PackageReference Include="SDL3-CS.Windows.Image" Version="3.4.4.7" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Include="assets\**\*">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
 </Project>
