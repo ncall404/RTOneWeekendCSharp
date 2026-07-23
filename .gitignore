@@ -4,4 +4,7 @@ obj/
 .vscode/
 .vs/
 
+assets/Textures/*
+!assets/Textures/README.md
+
 notes.txt
