@@ -10,7 +10,9 @@
   <ItemGroup>
     <PackageReference Include="SDL3-CS" Version="3.4.12.3" />
     <PackageReference Include="SDL3-CS.MacOS" Version="3.4.12.1" />
+    <PackageReference Include="SDL3-CS.MacOS.Image" Version="3.4.4.7" />
     <PackageReference Include="SDL3-CS.Windows" Version="3.4.12.1" />
+    <PackageReference Include="SDL3-CS.Windows.Image" Version="3.4.4.7" />
   </ItemGroup>
 
 </Project>
