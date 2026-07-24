@@ -36,8 +36,7 @@ public class ImageHelper
 
 	public bool LoadImage(string imagePath)
 	{
-		nint imageSurface = SDL.LoadSurface(imagePath);
-		
+		nint imageSurface = Image.Load(imagePath);
 		if (imageSurface == 0)
 		{
 			Console.WriteLine($"Image file failed to load: {SDL.GetError()}");
