@@ -85,7 +85,6 @@ class Program
 					if (Settings.SelectedScene < Settings.NumScenes)
 					{
 						Settings.SelectedScene++;
-						Console.WriteLine("Selected scene: " + Settings.SelectedScene);
 					}
 				}
 					// Decrease selected scene number
@@ -94,7 +93,6 @@ class Program
 					if (Settings.SelectedScene > 0)
 					{
 						Settings.SelectedScene--;
-						Console.WriteLine("Selected scene: " + Settings.SelectedScene);
 					}
 				}
 					// Load selected scene
@@ -222,6 +220,10 @@ class Program
 				(world, camera) = LoadScene3();
 				Settings.LoadedScene = 3;
 				break;
+			case 4:
+				(world, camera) = LoadScene4();
+				Settings.LoadedScene = 4;
+				break;
 			default:
 				// Empty scene
 				(world, camera) = (new(), new(16.0/9.0, 10, 1, 1, 40, new(0, 0, 0), new(0, 0, -1), new(0, 1, 0)));
@@ -260,8 +262,6 @@ class Program
 			10,						// Defocus Angle (for depth of field, 0 = no depth of field)
 			3.5						// Focus  distance (for depth of field)
 		);
-
-		Console.WriteLine("Scene 1 Loaded");
 
 		return (world, camera);
 	}
@@ -333,8 +333,6 @@ class Program
 			10.0					// Focus  distance (for depth of field)
 		);
 
-		Console.WriteLine("Scene 2 Loaded");
-
 		return (world, camera);
 	}
 
@@ -359,7 +357,27 @@ class Program
 			new(0, 1, 0)			// Up vector.
 		);
 
-		Console.WriteLine("Scene 3 Loaded");
+		return (world, camera);
+	}
+
+	private static (HittableList, Camera) LoadScene4()
+	{
+		HittableList world = new();
+
+		ImageTexture earthTexture = new ImageTexture("./assets/SampleTextures/earthmap.jpg");
+		Lambertian earthSurface = new Lambertian(earthTexture);
+		world.Add(new Sphere(new(0, 0, 0), 2, earthSurface));
+
+		Camera camera = new(
+			16.0 / 9.0,				// Aspect ratio
+			1280,					// Render width
+			100,					// Samples per pixel
+			50,						// Max depth (number of bounces for rays)
+			20,						// Vertical field of view
+			new(0, 0, 12),			// Camera position.
+			new(0, 0, 0),			// Look at point.
+			new(0, 1, 0)			// Up vector.
+		);
 
 		return (world, camera);
 	}
