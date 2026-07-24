@@ -15,7 +15,7 @@ public class ImageHelper
 	public byte[]? ImageBuffer { get; protected set; }
 	private const int BYTES_PER_PIXEL = 4;
 	private int BytesPerScanline = 4;
-	private ImmutableArray<byte> MAGENTA = [255, 0, 255, 255];
+	private ImmutableArray<byte> MAGENTA = [255, 255, 0, 255];
 
 	public ImageHelper() {}
 
