@@ -11,6 +11,7 @@ public class Sphere : Hittable
 	private double radius;
 	private Material material;
 	public override Aabb BoundingBox { get; protected set; }
+	public Vec3 RotationOffset { get; set; } = new(0, 0, 0); // U, V, Time.
 
 	public Sphere(Vec3 center, double radius, Material material)
 	{
@@ -57,7 +58,7 @@ public class Sphere : Hittable
 	}
 
 	// Get the sampled point on a sphere.
-	private static (double, double) GetSphereUV(Vec3 p)
+	private (double, double) GetSphereUV(Vec3 p)
 	{
 		// p: a given point on the sphere of radius one, centered at the origin.
 		// u: returned value [0,1] of angle around the Y axis from X=-1.
@@ -69,9 +70,18 @@ public class Sphere : Hittable
 		double theta = Math.Acos(-p.Y);
 		double phi = Math.Atan2(-p.Z, p.X) + Math.PI;
 
-		double u = phi / (2 * Math.PI);
-		double v = theta / Math.PI;
+		double u = (phi / (2 * Math.PI)) + (RotationOffset.X * RotationOffset.Z);
+		double v = (theta / Math.PI) + (RotationOffset.Y * RotationOffset.Z);
+
+		// Wrap the UV coordinates to be between 0 and 1 to prevent smearing in motion.
+		u -= Math.Floor(u);
+		v -= Math.Floor(v);
 
 		return (u, v);
+	}
+
+	public void UpdateRotationOffset(double time)
+	{
+		RotationOffset = new Vec3(RotationOffset.X, RotationOffset.Y, time);
 	}
 }
