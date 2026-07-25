@@ -9,6 +9,16 @@ public class HittableList : Hittable
 {
 	public List<Hittable> Objects {get;} = [];
 
+	// Allows access to the objects in the list.
+	public Hittable this[int index]
+	{
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		get
+		{
+			return Objects[index];
+		}
+	}
+
 	public override Aabb BoundingBox { get; protected set; } // Bounding box for all the objects in the list.
 
 	public HittableList() {}
