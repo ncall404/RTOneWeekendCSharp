@@ -69,7 +69,7 @@ class Program
 					sceneChanged = true;
 				}
 				// Toggles real-time rendering on/off.
-				else if (e.Type == (uint)SDL.EventType.KeyDown && e.Key.Key == SDL.Keycode.Alpha2 && Settings.SelectedScene > 0)
+				else if (e.Type == (uint)SDL.EventType.KeyDown && e.Key.Key == SDL.Keycode.Alpha2)
 				{
 					Settings.RealTimeRender = !Settings.RealTimeRender;
 				}
@@ -162,6 +162,15 @@ class Program
 				SDL.RenderDebugText(renderer, 5, 5, $"Selected Scene: {Settings.SelectedScene} / {Settings.NumScenes}");
 				SDL.RenderDebugText(renderer, 5, 15, $"Loaded Scene: {Settings.LoadedScene} / {Settings.NumScenes}");
 			}
+
+			// Update the rotation of the sphere for scene 4.
+			if (Settings.LoadedScene == 4 && world[0] is Sphere sphere)
+			{
+				if (Settings.RealTimeRender)
+					sphere.UpdateRotationOffset(SDL.GetTicks() * 0.0001);
+				else
+					sphere.UpdateRotationOffset(0);
+			}
 			
 
             SDL.RenderPresent(renderer);
@@ -228,7 +237,6 @@ class Program
 				// Empty scene
 				(world, camera) = (new(), new(16.0/9.0, 10, 1, 1, 40, new(0, 0, 0), new(0, 0, -1), new(0, 1, 0)));
 				Settings.LoadedScene = 0;
-				Settings.RealTimeRender = false;
 				break;
 		}
 		return (world, camera);
@@ -366,7 +374,11 @@ class Program
 
 		ImageTexture earthTexture = new ImageTexture("./assets/SampleTextures/earthmap.jpg");
 		Lambertian earthSurface = new Lambertian(earthTexture);
-		world.Add(new Sphere(new(0, 0, 0), 2, earthSurface));
+		Sphere earth = new Sphere(new(0, 0, 0), 2, earthSurface)
+		{
+			RotationOffset = new(-0.5, 0, 0)
+		};
+		world.Add(earth);
 
 		Camera camera = new(
 			16.0 / 9.0,				// Aspect ratio
