@@ -11,9 +11,4 @@ public static class Settings
 	// Sizing for the SDL window; not the render target that is written to for raytracing.
 	public static int WindowWidth { get; set; } = 1280;
 	public static int WindowHeight { get; set; } = 720;
-
-	// Currently selected scene.
-	public static int NumScenes {get;} = 4;
-	public static int SelectedScene {get; set;} = 0;
-	public static int LoadedScene {get; set;} = 0;
 }
