@@ -7,8 +7,7 @@ using SDL3;
 
 using RTOneWeekend.Core;
 using RTOneWeekend.Geometry;
-using RTOneWeekend.Materials;
-using RTOneWeekend.Textures;
+using RTOneWeekend.Scenes;
 
 namespace RTOneWeekend;
 
@@ -17,12 +16,12 @@ class Program
     [STAThread]
     static void Main(string[] args)
     {
-		// Create the initial scene.
-		HittableList world;
-		Camera camera;
+		Scene activeScene;
 
-		(world, camera) = SceneLoader(); // Load the initial scene.
-		bool sceneChanged = true; // Bool to track if the selected scene has changed and needs a rerender even in non-realtime mode.
+		// Load the initial scene.
+		activeScene = SceneManager.LoadScene(SceneManager.SelectedScene);
+
+		bool sceneChanged = true; // Bool to track if the loaded scene has changed and needs a rerender even in non-realtime mode.
 
         if (!SDL.Init(SDL.InitFlags.Video))
         {
@@ -38,7 +37,7 @@ class Program
 		SDL.SetRenderDrawColor(renderer, 0, 150, 0, 255); // Set render draw color for debug text.
 
         // Streaming texture for pixel data with 4 bytes per pixel (RGBA8888)
-        nint texture = CreateRenderTexture(renderer, window, camera);
+        nint texture = CreateRenderTexture(renderer, window, activeScene.Camera);
 
 
 
@@ -82,51 +81,56 @@ class Program
 					// Increase selected scene number
 				else if (e.Type == (uint)SDL.EventType.KeyDown && e.Key.Key == SDL.Keycode.Right)
 				{
-					if (Settings.SelectedScene < Settings.NumScenes)
+					if (SceneManager.SelectedScene < SceneManager.SceneCount)
 					{
-						Settings.SelectedScene++;
+						SceneManager.SelectedScene++;
 					}
 				}
 					// Decrease selected scene number
 				else if (e.Type == (uint)SDL.EventType.KeyDown && e.Key.Key == SDL.Keycode.Left)
 				{
-					if (Settings.SelectedScene > 0)
+					if (SceneManager.SelectedScene > 0)
 					{
-						Settings.SelectedScene--;
+						SceneManager.SelectedScene--;
 					}
 				}
 					// Load selected scene
 				else if (e.Type == (uint)SDL.EventType.KeyDown && e.Key.Key == SDL.Keycode.Down)
 				{
-					if (Settings.SelectedScene >= 0 && Settings.SelectedScene <= Settings.NumScenes)
+					if (SceneManager.SelectedScene >= 0 && SceneManager.SelectedScene <= SceneManager.SceneCount)
 					{
 						sceneChanged = true;
-						(world, camera) = SceneLoader();
+						activeScene = SceneManager.LoadScene(SceneManager.SelectedScene);
 					}
 				}
             }
 
 			if (Settings.RealTimeRender || sceneChanged)
 			{
-				camera.CalculateViewport();
+				activeScene.Camera.CalculateViewport();
+				if (!sceneChanged)
+					activeScene.ProcessScene(); // Scene-specific processing for when Settings.RealTime is true.
+
 				if (sceneChanged)
 				{
 					// Recreate the texture if a different scene is loaded.
 					SDL.DestroyTexture(texture);
-					texture = CreateRenderTexture(renderer, window, camera);
+					texture = CreateRenderTexture(renderer, window, activeScene.Camera);
+					if (Settings.RealTimeRender)
+						sceneChanged = false;
 				}
 
 				ulong startTime = SDL.GetTicks();
-				UpdateTextureRender(camera, world, texture);
+				UpdateTextureRender(activeScene.Camera, activeScene.World, texture);
 				ulong endTime = SDL.GetTicks();
 
+				// Write the render time to the console if not doing real-time rendering.
 				if (!Settings.RealTimeRender)
 				{
 					Console.WriteLine($"Render time: {endTime - startTime}ms");
 					sceneChanged = false;
 				}
 			}
-			
 
             SDL.RenderClear(renderer);
 
@@ -159,20 +163,10 @@ class Program
 					SDL.RenderDebugText(renderer, 5, 25, $"fps: {currentFps:F2}");
 					SDL.RenderDebugText(renderer, 5, 35, $"ms: {frameTime:F2}");
 				}
-				SDL.RenderDebugText(renderer, 5, 5, $"Selected Scene: {Settings.SelectedScene} / {Settings.NumScenes}");
-				SDL.RenderDebugText(renderer, 5, 15, $"Loaded Scene: {Settings.LoadedScene} / {Settings.NumScenes}");
-			}
-
-			// Update the rotation of the sphere for scene 4.
-			if (Settings.LoadedScene == 4 && world[0] is Sphere sphere)
-			{
-				if (Settings.RealTimeRender)
-					sphere.UpdateRotationOffset(SDL.GetTicks() * 0.0001);
-				else
-					sphere.UpdateRotationOffset(0);
+				SDL.RenderDebugText(renderer, 5, 5, $"Selected Scene: {SceneManager.SelectedScene} / {SceneManager.SceneCount}");
+				SDL.RenderDebugText(renderer, 5, 15, $"Loaded Scene: {SceneManager.LoadedScene} / {SceneManager.SceneCount}");
 			}
 			
-
             SDL.RenderPresent(renderer);
         }
 
@@ -207,190 +201,5 @@ class Program
         }
 		SDL.SetTextureScaleMode(texture, SDL.ScaleMode.Nearest); // Set the texture to the correct scaling mode to not be blurry if the window is a higher resolution.
 		return texture;
-	}
-
-	// Scene Loading Functions ========================================================================= TODO: Make an actual scene loader class at some point.
-
-	private static (HittableList, Camera) SceneLoader()
-	{
-		HittableList world;
-		Camera camera;
-		switch (Settings.SelectedScene)
-		{
-			case 1:
-				(world, camera) = LoadScene1();
-				Settings.LoadedScene = 1;
-				break;
-			case 2:
-				(world, camera) = LoadScene2();
-				Settings.LoadedScene = 2;
-				break;
-			case 3:
-				(world, camera) = LoadScene3();
-				Settings.LoadedScene = 3;
-				break;
-			case 4:
-				(world, camera) = LoadScene4();
-				Settings.LoadedScene = 4;
-				break;
-			default:
-				// Empty scene
-				(world, camera) = (new(), new(16.0/9.0, 10, 1, 1, 40, new(0, 0, 0), new(0, 0, -1), new(0, 1, 0)));
-				Settings.LoadedScene = 0;
-				break;
-		}
-		return (world, camera);
-	}
-
-	// This creates the scene from book 1 with 3 balls of different materials.
-	private static (HittableList, Camera) LoadScene1()
-	{
-		HittableList world = new(new Sphere(new(0, -100.5, -1), 100, new Lambertian(new Vec3(0.8, 0.8, 0.0)))); // Ground sphere
-
-		// Lambertian spheres
-		world.Add(new Sphere(new(0, 0, -1.2), 0.5, new Lambertian(new Vec3(0.1, 0.2, 0.5))));
-
-		// Metal spheres
-		world.Add(new Sphere(new(1.0, 0.0, -1.0), 0.5, new Metal(new Vec3(0.8, 0.6, 0.2), 1.0))); // Right
-
-		// Dielectric spheres
-			// Hollow glass sphere
-		world.Add(new Sphere(new(-1.0, 0.0, -1.0), 0.5, new Dielectric(1.5))); // Left outer
-		world.Add(new Sphere(new(-1.0, 0.0, -1.0), 0.4, new Dielectric(1.0 / 1.5))); // Left inner
-
-		Camera camera = new(
-			16.0 / 9.0,				// Aspect ratio
-			700,					// Render width
-			50,						// Samples per pixel
-			100,					// Max depth (number of bounces for rays)
-			40,						// Vertical field of view
-			new(-2, 2, 1),			// Camera position.
-			new(0, 0, -1),			// Look at point.
-			new(0, 1, 0),			// Up vector.
-			10,						// Defocus Angle (for depth of field, 0 = no depth of field)
-			3.5						// Focus  distance (for depth of field)
-		);
-
-		return (world, camera);
-	}
-
-	// This creates the scene from book 1 that is used for the final render. Named "Bouncing Spheres" in book 2.
-	private static (HittableList, Camera) LoadScene2()
-	{
-		HittableList world = new();
-
-		Lambertian matGround = new Lambertian(new CheckerTexture(0.32, new Vec3(0.2, 0.3, 0.1), new Vec3(0.9, 0.9, 0.9)));
-		world.Add(new Sphere(new(0, -1000, 0), 1000, matGround));
-
-		for (int a = -11; a < 11; a++)
-		{
-			for (int b = -11; b < 11; b++)
-			{
-				double chooseMat = RandomNum.RandomDouble();
-				Vec3 center = new(a + 0.9*RandomNum.RandomDouble(), 0.2, b + 0.9*RandomNum.RandomDouble());
-
-				if ((center - new Vec3(4, 0.2, 0)).Length() > 0.9)
-				{
-					Material matSphere;
-
-					if (chooseMat < 0.8)
-					{
-						// Diffuse
-						Vec3 albedo = Vec3.Random() * Vec3.Random();
-						matSphere = new Lambertian(albedo);
-						world.Add(new Sphere(center, 0.2, matSphere));
-					}
-					else if (chooseMat < 0.95)
-					{
-						// Metal
-						Vec3 albedo = Vec3.Random(0.5, 1);
-						double fuzz = RandomNum.RandomDouble(0, 0.5);
-						matSphere = new Metal(albedo, fuzz);
-						world.Add(new Sphere(center, 0.2, matSphere));
-					}
-					else
-					{
-						// Glass
-						matSphere = new Dielectric(1.5);
-						world.Add(new Sphere(center, 0.2, matSphere));
-					}
-				}
-			}
-		}
-		Material mat1 = new Dielectric(1.5);
-		world.Add(new Sphere(new(0, 1, 0), 1.0, mat1));
-
-		Material mat2 = new Lambertian(new Vec3(0.4, 0.2, 0.1));
-		world.Add(new Sphere(new(-4, 1, 0), 1.0, mat2));
-
-		Material mat3 = new Metal(new(0.7, 0.6, 0.5), 0.0);
-		world.Add(new Sphere(new(4, 1, 0), 1.0, mat3));
-
-		world = new HittableList(new BvhNode(world));
-
-		Camera camera = new(
-			16.0 / 9.0,				// Aspect ratio
-			700,					// Render width
-			50,						// Samples per pixel
-			50,						// Max depth (number of bounces for rays)
-			20,						// Vertical field of view
-			new(13, 2, 3),			// Camera position.
-			new(0, 0, 0),			// Look at point.
-			new(0, 1, 0),			// Up vector.
-			0.6,					// Defocus Angle (for depth of field, 0 = no depth of field)
-			10.0					// Focus  distance (for depth of field)
-		);
-
-		return (world, camera);
-	}
-
-	// Checkered spheres - book 2.
-	private static (HittableList, Camera) LoadScene3()
-	{
-		HittableList world = new();
-
-		CheckerTexture checker = new(0.32, new Vec3(0.2, 0.3, 0.1), new Vec3(0.9, 0.9, 0.9));
-
-		world.Add(new Sphere(new(0, -10, 0), 10, new Lambertian(checker)));
-		world.Add(new Sphere(new(0, 10, 0), 10, new Lambertian(checker)));
-
-		Camera camera = new(
-			16.0 / 9.0,				// Aspect ratio
-			700,					// Render width
-			50,						// Samples per pixel
-			50,						// Max depth (number of bounces for rays)
-			20,						// Vertical field of view
-			new(13, 2, 3),			// Camera position.
-			new(0, 0, 0),			// Look at point.
-			new(0, 1, 0)			// Up vector.
-		);
-
-		return (world, camera);
-	}
-
-	private static (HittableList, Camera) LoadScene4()
-	{
-		HittableList world = new();
-
-		ImageTexture earthTexture = new ImageTexture("./assets/SampleTextures/earthmap.jpg");
-		Lambertian earthSurface = new Lambertian(earthTexture);
-		Sphere earth = new Sphere(new(0, 0, 0), 2, earthSurface)
-		{
-			RotationOffset = new(-0.5, 0, 0)
-		};
-		world.Add(earth);
-
-		Camera camera = new(
-			16.0 / 9.0,				// Aspect ratio
-			1280,					// Render width
-			100,					// Samples per pixel
-			50,						// Max depth (number of bounces for rays)
-			20,						// Vertical field of view
-			new(0, 0, 12),			// Camera position.
-			new(0, 0, 0),			// Look at point.
-			new(0, 1, 0)			// Up vector.
-		);
-
-		return (world, camera);
 	}
 }
