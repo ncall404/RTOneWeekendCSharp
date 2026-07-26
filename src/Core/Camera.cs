@@ -2,7 +2,6 @@
 
 using SDL3;
 using RTOneWeekend.Geometry;
-using System.ComponentModel.Design;
 
 namespace RTOneWeekend.Core;
 
