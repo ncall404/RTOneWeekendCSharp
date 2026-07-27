@@ -4,7 +4,7 @@ namespace RTOneWeekend.Scenes;
 
 public static class SceneManager
 {
-	public static int SceneCount { get; } = 4;
+	public static int SceneCount { get; } = 5;
 	public static int SelectedScene { get; set; } = 0;
 	public static int LoadedScene { get; set; } = 0;
 
@@ -27,6 +27,9 @@ public static class SceneManager
 				break;
 			case 4:
 				activeScene = new Scene4(); // Earth
+				break;
+			case 5:
+				activeScene = new Scene5(); // Perlin spheres
 				break;
 			default:
 				activeScene = new DefaultScene(); // Empty
