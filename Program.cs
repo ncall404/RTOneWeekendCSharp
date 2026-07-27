@@ -85,6 +85,10 @@ class Program
 					{
 						SceneManager.SelectedScene++;
 					}
+					else if (SceneManager.SelectedScene == SceneManager.SceneCount)
+					{
+						SceneManager.SelectedScene = 0;
+					}
 				}
 					// Decrease selected scene number
 				else if (e.Type == (uint)SDL.EventType.KeyDown && e.Key.Key == SDL.Keycode.Left)
@@ -92,6 +96,10 @@ class Program
 					if (SceneManager.SelectedScene > 0)
 					{
 						SceneManager.SelectedScene--;
+					}
+					else if (SceneManager.SelectedScene == 0)
+					{
+						SceneManager.SelectedScene = SceneManager.SceneCount;
 					}
 				}
 					// Load selected scene
