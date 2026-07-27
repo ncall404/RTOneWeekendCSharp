@@ -30,6 +30,11 @@ public class Perlin
 		double v = p.Y - Math.Floor(p.Y);
 		double w = p.Z - Math.Floor(p.Z);
 
+		// Hermitian smoothing
+		u = u*u*(3 - 2*u);
+		v = v*v*(3 - 2*v);
+		w = w*w*(3 - 2*w);
+
 		int i = (int)Math.Floor(p.X);
 		int j = (int)Math.Floor(p.Y);
 		int k = (int)Math.Floor(p.Z);
