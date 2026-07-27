@@ -76,11 +76,11 @@ public readonly struct Vec3(double x, double y, double z)
 		return new Vec3(RandomNum.RandomDouble(min, max), RandomNum.RandomDouble(min, max), RandomNum.RandomDouble(min, max));
 	}
 
-	// Calculates the dot product of two vectors.
+	// Calculates the dot product of two vectors. Also known as the scalar product; a scalar number that is gotten by multiplying two vectors together.
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	public static double Dot(Vec3 a, Vec3 b) => (a.X * b.X) + (a.Y * b.Y) + (a.Z * b.Z);
 
-	// Calculates the cross product of two vectors.
+	// Calculates the cross product of two vectors. This is a vector that is perpendicular to both of the original vectors.
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	public static Vec3 Cross(Vec3 a, Vec3 b)
 	{
