@@ -7,17 +7,17 @@ namespace RTOneWeekend.Geometry;
 
 public class Sphere : Hittable
 {
-	private Vec3 center;
-	private double radius;
-	private Material material;
+	private readonly Vec3 _center;
+	private readonly double _radius;
+	private readonly Material _material;
 	public override Aabb BoundingBox { get; protected set; }
 	public Vec3 RotationOffset { get; set; } = new(0, 0, 0); // U, V, Time.
 
 	public Sphere(Vec3 center, double radius, Material material)
 	{
-		this.center = center;
-		this.radius = Math.Max(0, radius);
-		this.material = material;
+		_center = center;
+		_radius = Math.Max(0, radius);
+		_material = material;
 
 		// Create the bounding box. NOTE: If center or radius are made dynamic in the real-time mode then send this to it's own function that is called when those are changed as well.
 		Vec3 radiusVec = new(radius, radius, radius);
@@ -26,10 +26,10 @@ public class Sphere : Hittable
 
 	public override bool Hit(in Ray r, Interval rayT, ref HitRecord rec)
 	{
-		Vec3 oc = center - r.Origin;
+		Vec3 oc = _center - r.Origin;
         double a = r.Direction.LengthSquared();
         double h = Vec3.Dot(r.Direction, oc);
-        double c = oc.LengthSquared() - radius*radius;
+        double c = oc.LengthSquared() - _radius*_radius;
 
         double discriminant = h*h - a*c;
 
@@ -49,10 +49,10 @@ public class Sphere : Hittable
 
 		rec.RayHitDistance = root;
 		rec.P = r.At(rec.RayHitDistance);
-		Vec3 outwardNormal = (rec.P - center) / radius;
+		Vec3 outwardNormal = (rec.P - _center) / _radius;
 		rec.SetFaceNormal(r, outwardNormal);
 		(rec.U, rec.V) = GetSphereUV(outwardNormal); // Update hitrecord uv coordinates.
-		rec.Material = material;
+		rec.Material = _material;
 
 		return true;
 	}

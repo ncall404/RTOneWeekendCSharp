@@ -7,20 +7,20 @@ namespace RTOneWeekend.Materials;
 
 class Metal: Material
 {
-    private Vec3 Albedo;
-	private double Fuzz; // Reduces reflectivity. Higher = more matte.
+    private readonly Vec3 _albedo;
+	private readonly double _fuzz; // Reduces reflectivity. Higher = more matte.
 	public Metal(Vec3 albedo, double fuzz)
 	{
-		Albedo = albedo;
-		Fuzz = fuzz < 1 ? fuzz : 1;
+		_albedo = albedo;
+		_fuzz = fuzz < 1 ? fuzz : 1;
 	}
     
 	public override bool Scatter(Ray rayIn, HitRecord rec, out Vec3 attenuation, out Ray scattered)
 	{
 		Vec3 reflected = Vec3.Reflect(rayIn.Direction, rec.Normal);
-		reflected = Vec3.UnitVector(reflected) + (Fuzz * Vec3.RandomUnitVector());
+		reflected = Vec3.UnitVector(reflected) + (_fuzz * Vec3.RandomUnitVector());
 		scattered = new Ray(rec.P, reflected);
-		attenuation = Albedo;
+		attenuation = _albedo;
 		return Vec3.Dot(scattered.Direction, rec.Normal) > 0;
 	}
 }

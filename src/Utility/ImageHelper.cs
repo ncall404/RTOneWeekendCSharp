@@ -13,9 +13,9 @@ public class ImageHelper
 	public int ImageWidth { get; protected set; } = 0;
 	public int ImageHeight { get; protected set; } = 0;
 	public byte[]? ImageBuffer { get; protected set; }
-	private const int BYTES_PER_PIXEL = 4;
-	private int BytesPerScanline = 4;
-	private ImmutableArray<byte> MAGENTA = [255, 255, 0, 255];
+	private const int BytesPerPixel = 4;
+	private int _bytesPerScanline = 4;
+	private readonly ImmutableArray<byte> _magenta = [255, 255, 0, 255];
 
 	public ImageHelper() {}
 
@@ -63,8 +63,8 @@ public class ImageHelper
 
 		ImageWidth = surface.Width;
 		ImageHeight = surface.Height;
-		BytesPerScanline = surface.Pitch;
-		int totalBytes = BytesPerScanline * ImageHeight;
+		_bytesPerScanline = surface.Pitch;
+		int totalBytes = _bytesPerScanline * ImageHeight;
 		ImageBuffer = new byte[totalBytes];
 
 		Marshal.Copy(surface.Pixels, ImageBuffer, 0, totalBytes); // Copy pixel data from surface to buffer.
@@ -81,8 +81,8 @@ public class ImageHelper
 
 		x = Math.Clamp(x, 0, ImageWidth - 1);
 		y = Math.Clamp(y, 0, ImageHeight - 1);
-		int offset = (x * BYTES_PER_PIXEL) + (y * BytesPerScanline);
-		return ImageBuffer.AsSpan(offset, BYTES_PER_PIXEL);
+		int offset = (x * BytesPerPixel) + (y * _bytesPerScanline);
+		return ImageBuffer.AsSpan(offset, BytesPerPixel);
 	}
 
 	// Sets the image to a magenta fallback for debugging.
@@ -91,7 +91,7 @@ public class ImageHelper
 	{
 		ImageWidth = 1;
 		ImageHeight = 1;
-		BytesPerScanline = 4;
-		ImageBuffer = [.. MAGENTA];
+		_bytesPerScanline = 4;
+		ImageBuffer = [.. _magenta];
 	}
 }

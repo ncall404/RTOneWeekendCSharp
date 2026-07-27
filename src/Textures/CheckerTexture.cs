@@ -7,15 +7,15 @@ namespace RTOneWeekend.Textures;
 
 public class CheckerTexture : Texture
 {
-	private double InvScale;
-	private Texture Odd;
-	private Texture Even;
+	private readonly double _invScale;
+	private readonly Texture _odd;
+	private readonly Texture _even;
 
 	public CheckerTexture(double scale, Texture even, Texture odd)
 	{
-		Odd = odd;
-		Even = even;
-		InvScale = 1.0 / scale;
+		_odd = odd;
+		_even = even;
+		_invScale = 1.0 / scale;
 	}
 
 	public CheckerTexture(double scale, Vec3 color1, Vec3 color2) : this(scale, new SolidColor(color1), new SolidColor(color2)) {}
@@ -23,12 +23,12 @@ public class CheckerTexture : Texture
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	public override Vec3 Value(double u, double v, Vec3 p)
 	{
-		int xInteger = (int)Math.Floor(p.X * InvScale);
-		int yInteger = (int)Math.Floor(p.Y * InvScale);
-		int zInteger = (int)Math.Floor(p.Z * InvScale);
+		int xInteger = (int)Math.Floor(p.X * _invScale);
+		int yInteger = (int)Math.Floor(p.Y * _invScale);
+		int zInteger = (int)Math.Floor(p.Z * _invScale);
 
 		bool isEven = (xInteger + yInteger + zInteger) % 2 == 0;
 		
-		return isEven ? Even.Value(u, v, p) : Odd.Value(u, v, p);
+		return isEven ? _even.Value(u, v, p) : _odd.Value(u, v, p);
 	}
 }

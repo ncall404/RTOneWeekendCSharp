@@ -6,8 +6,8 @@ namespace RTOneWeekend.Geometry;
 
 public class BvhNode : Hittable
 {
-	private Hittable Left;
-	private Hittable Right;
+	private readonly Hittable _left;
+	private readonly Hittable _right;
 	public override Aabb BoundingBox { get; protected set; }
 
 	// Copies the input list of objects into a new list and creates the BVH.
@@ -29,20 +29,20 @@ public class BvhNode : Hittable
 
 		if (objectSpan == 1)
 		{
-			Left = Right = objects[start];
+			_left = _right = objects[start];
 		}
 		else if (objectSpan == 2)
 		{
-			Left = objects[start];
-			Right = objects[start + 1];
+			_left = objects[start];
+			_right = objects[start + 1];
 		}
 		else
 		{
 			// NOTE: Sorting had to be done slightly differently to the tutorial due to language/library differences between C++ and C#.
 			objects.Sort(start, objectSpan, Comparer<Hittable>.Create(comparator)); // Create a comparer to act the same as std::sort in the tutorial.
 			int mid = start + objectSpan / 2;
-			Left = new BvhNode(objects, start, mid);
-			Right = new BvhNode(objects, mid, end);
+			_left = new BvhNode(objects, start, mid);
+			_right = new BvhNode(objects, mid, end);
 		}
 	}
 
@@ -51,8 +51,8 @@ public class BvhNode : Hittable
 		if (!BoundingBox.Hit(r, rayT))
 			return false;
 
-		bool HitLeft = Left.Hit(r, rayT, ref rec);
-		bool HitRight = Right.Hit(r, HitLeft ? new Interval(rayT.Min, rec.RayHitDistance) : rayT, ref rec);
+		bool HitLeft = _left.Hit(r, rayT, ref rec);
+		bool HitRight = _right.Hit(r, HitLeft ? new Interval(rayT.Min, rec.RayHitDistance) : rayT, ref rec);
 
 		return HitLeft || HitRight;
 	}

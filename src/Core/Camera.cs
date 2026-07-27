@@ -21,13 +21,13 @@ public class Camera
 	public double DefocusAngle = 0; // Variation angle of rays through each pixel. 0 = no depth of field.
 	public double FocusDistance = 10; // Distance from the camera to the plane of perfect focus.
 
-	private double PixelSamplesScale; // Color scale factor for a sum of pixel samples.
-	private Vec3 Pixel00Location; // Location of the lower left pixel.
-	private Vec3 PixelDeltaU; // Offset to the pixel to the right.
-	private Vec3 PixelDeltaV; // Offset to the pixel below.
-	private Vec3 u, v, w; // Camera frame basis vectors. (u = pointing right, camera right, v = pointing camera up, w = pointing opposite the view direction)
-	private Vec3 DefocusDiskU; // Defocus disk horizontal radius.
-	private Vec3 DefocusDiskV; // Defocus disk vertical radius.
+	private double _pixelSamplesScale; // Color scale factor for a sum of pixel samples.
+	private Vec3 _pixel00Location; // Location of the lower left pixel.
+	private Vec3 _pixelDeltaU; // Offset to the pixel to the right.
+	private Vec3 _pixelDeltaV; // Offset to the pixel below.
+	private Vec3 _u, _v, _w; // Camera frame basis vectors. (u = pointing right, camera right, v = pointing camera up, w = pointing opposite the view direction)
+	private Vec3 _defocusDiskU; // Defocus disk horizontal radius.
+	private Vec3 _defocusDiskV; // Defocus disk vertical radius.
 
 	public Camera(double aspectRatio, int width, int samplesPerPixel, int maxDepth, double verticalFOV, Vec3 cameraPosition, Vec3 lookAt, Vec3 up, double defocusAngle = 0, double focusDistance = 10)
 	{
@@ -68,11 +68,11 @@ public class Camera
 					}
 
 					// Pack color into 32 bit uint
-					uint pixelColor = Vec3.WriteColor(rayColor * PixelSamplesScale, (byte)SDL.AlphaOpaque);
+					uint pixelColor = Vec3.WriteColor(rayColor * _pixelSamplesScale, (byte)SDL.AlphaOpaque);
 					BitConverter.TryWriteBytes(pixelBuffer.AsSpan(offset, 4), pixelColor);
 				} else
 				{
-					Vec3 pixelCenter = Pixel00Location + (x * PixelDeltaU) + (y * PixelDeltaV);
+					Vec3 pixelCenter = _pixel00Location + (x * _pixelDeltaU) + (y * _pixelDeltaV);
 					Vec3 rayDirection = pixelCenter - CameraPosition;
 					Ray r = new(CameraPosition, rayDirection);
 					Vec3 rayColor = RayColor(r, MaxDepth, world);
@@ -94,7 +94,7 @@ public class Camera
 		Height = (int)(Width / AspectRatio);
         Height = (Height < 1) ? 1 : Height; // Make sure that image height is at least 1.
 
-		PixelSamplesScale = 1.0 / SamplesPerPixel;
+		_pixelSamplesScale = 1.0 / SamplesPerPixel;
 
 		// Determine viewport dimensions.
 		// double focalLength = (CameraPosition - LookAt).Length();
@@ -104,33 +104,33 @@ public class Camera
         double viewportWidth = viewportHeight * (Width / (double)Height);
 
 		// Calculate the u, v, w unit basis vectors for the camera coordinate frame.
-		w = Vec3.UnitVector(CameraPosition - LookAt);
-		u = Vec3.UnitVector(Vec3.Cross(Up, w));
-		v = Vec3.Cross(w, u);
+		_w = Vec3.UnitVector(CameraPosition - LookAt);
+		_u = Vec3.UnitVector(Vec3.Cross(Up, _w));
+		_v = Vec3.Cross(_w, _u);
 
 		// Calculate the vectors across the horizontal and down the vertical viewport edges.
-        Vec3 viewportU = viewportWidth * u; // Vector across the viewport horizontal edge.
-        Vec3 viewportV = viewportHeight * -v; // Vector across the viewport vertical edge.
+        Vec3 viewportU = viewportWidth * _u; // Vector across the viewport horizontal edge.
+        Vec3 viewportV = viewportHeight * -_v; // Vector across the viewport vertical edge.
 
 		// Calculate the horizontal and vertical delta vectors from pixel to pixel.
-        PixelDeltaU = viewportU / Width;
-        PixelDeltaV = viewportV / Height;
+        _pixelDeltaU = viewportU / Width;
+        _pixelDeltaV = viewportV / Height;
 
 		// Calculate the location of the upper left pixel of the viewport.
-        Vec3 viewportUpperLeft = CameraPosition - (FocusDistance * w) - viewportU/2 - viewportV/2;
-		Pixel00Location = viewportUpperLeft + 0.5 * (PixelDeltaU + PixelDeltaV);
+        Vec3 viewportUpperLeft = CameraPosition - (FocusDistance * _w) - viewportU/2 - viewportV/2;
+		_pixel00Location = viewportUpperLeft + 0.5 * (_pixelDeltaU + _pixelDeltaV);
 
 		// Calculate the camera defocus (DOF) disk basis vectors.
 		double defocusRadius = FocusDistance * Math.Tan(ConvertUnit.DegreesToRadians(DefocusAngle / 2));
-		DefocusDiskU = u * defocusRadius;
-		DefocusDiskV = v * defocusRadius;
+		_defocusDiskU = _u * defocusRadius;
+		_defocusDiskV = _v * defocusRadius;
 	}
 
 	private Ray GetRay(int x, int y)
 	{
 		// Construct a camera ray originating from the origin and directed at a randomly sampled point around the pixel location i, j.
 		Vec3 offset = SampleSquare();
-		Vec3 pixelSample = Pixel00Location + ((x + offset.X) * PixelDeltaU) + ((y + offset.Y) * PixelDeltaV);
+		Vec3 pixelSample = _pixel00Location + ((x + offset.X) * _pixelDeltaU) + ((y + offset.Y) * _pixelDeltaV);
 
 		Vec3 rayOrigin = (DefocusAngle <= 0) ? CameraPosition : DefocusDiskSample();
 		Vec3 rayDirection = pixelSample - rayOrigin;
@@ -147,7 +147,7 @@ public class Camera
 	{
 		// Returns a random point in the camera defocus disk for DOF.
 		Vec3 p = Vec3.RandomInUnitDisk();
-		return CameraPosition + (p.X * DefocusDiskU) + (p.Y * DefocusDiskV);
+		return CameraPosition + (p.X * _defocusDiskU) + (p.Y * _defocusDiskV);
 	}
 
 	private static Vec3 RayColor(Ray r, int depth, Hittable world)

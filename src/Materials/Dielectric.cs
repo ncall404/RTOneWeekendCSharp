@@ -7,17 +7,17 @@ namespace RTOneWeekend.Materials;
 
 class Dielectric : Material
 {
-    private double RefractionIndex; // Either the refractive index in vacuum/air or the ratio of the materials refractive index over the refractive index of the enclosing material.
+    private readonly double _refractionIndex; // Either the refractive index in vacuum/air or the ratio of the materials refractive index over the refractive index of the enclosing material.
 
 	public Dielectric(double refractionIndex)
 	{
-		RefractionIndex = refractionIndex;
+		_refractionIndex = refractionIndex;
 	}
 
 	public override bool Scatter(Ray rayIn, HitRecord rec, out Vec3 attenuation, out Ray scattered)
 	{
 		attenuation = new Vec3(1.0, 1.0, 1.0);
-		double ri = rec.FrontFace ? (1.0/RefractionIndex) : RefractionIndex; // Refractive index ratio depending on if ray is hitting the front face of the object.
+		double ri = rec.FrontFace ? (1.0/_refractionIndex) : _refractionIndex; // Refractive index ratio depending on if ray is hitting the front face of the object.
 
 		Vec3 unitDirection = Vec3.UnitVector(rayIn.Direction);
 		double cosTheta = Math.Min(Vec3.Dot(-unitDirection, rec.Normal), 1.0);
