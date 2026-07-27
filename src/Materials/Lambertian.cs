@@ -14,14 +14,14 @@ class Lambertian : Material
 
 	public override bool Scatter(Ray rayIn, HitRecord rec, out Vec3 attenuation, out Ray scattered)
 	{
-		Vec3 scatterDirection = rec.Normal + Vec3.RandomUnitVector();
+		Vec3 scatterDirection = rec.normal + Vec3.RandomUnitVector();
 
 		// Catch scatter direction if too close to zero.
 		if (scatterDirection.NearZero())
-			scatterDirection = rec.Normal;
+			scatterDirection = rec.normal;
 
-		scattered = new Ray(rec.P, scatterDirection);
-		attenuation = _tex.Value(rec.U, rec.V, rec.P);
+		scattered = new Ray(rec.p, scatterDirection);
+		attenuation = _tex.Value(rec.u, rec.v, rec.p);
 		return true;
 	}
 }

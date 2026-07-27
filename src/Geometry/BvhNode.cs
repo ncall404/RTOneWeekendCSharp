@@ -52,7 +52,7 @@ public class BvhNode : Hittable
 			return false;
 
 		bool HitLeft = _left.Hit(r, rayT, ref rec);
-		bool HitRight = _right.Hit(r, HitLeft ? new Interval(rayT.Min, rec.RayHitDistance) : rayT, ref rec);
+		bool HitRight = _right.Hit(r, HitLeft ? new Interval(rayT.min, rec.rayHitDistance) : rayT, ref rec);
 
 		return HitLeft || HitRight;
 	}
@@ -62,8 +62,8 @@ public class BvhNode : Hittable
 		Interval aAxisInterval = a.BoundingBox.AxisInterval(axisIndex);
 		Interval bAxisInterval = b.BoundingBox.AxisInterval(axisIndex);
 
-		if (aAxisInterval.Min < bAxisInterval.Min) return -1;
-		if (aAxisInterval.Min > bAxisInterval.Min) return 1;
+		if (aAxisInterval.min < bAxisInterval.min) return -1;
+		if (aAxisInterval.min > bAxisInterval.min) return 1;
 		return 0;
 	}
 	private static int BoxXCompare(Hittable a, Hittable b) => BoxCompare(a, b, 0);

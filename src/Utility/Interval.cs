@@ -6,42 +6,42 @@ namespace RTOneWeekend.Utility;
 
 public struct Interval
 {
-	public double Min;
-	public double Max;
+	public double min;
+	public double max;
 
 	// Default interval is empty.
 	public Interval()
 	{
-		Min = double.PositiveInfinity;
-		Max = double.NegativeInfinity;
+		min = double.PositiveInfinity;
+		max = double.NegativeInfinity;
 	}
 
 	public Interval(double min, double max)
 	{
-		Min = min;
-		Max = max;
+		this.min = min;
+		this.max = max;
 	}
 
 	// Create the interval that tightly surrounds two input intervals.
 	public Interval(Interval a, Interval b)
 	{
-		Min = a.Min <= b.Min ? a.Min : b.Min;
-		Max = a.Max >= b.Max ? a.Max : b.Max;
+		min = a.min <= b.min ? a.min : b.min;
+		max = a.max >= b.max ? a.max : b.max;
 	}
 
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
-	public double Size() => Max - Min;
+	public double Size() => max - min;
 
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
-	public bool Contains(double x) => Min <= x && x <= Max;
+	public bool Contains(double x) => min <= x && x <= max;
 
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
-	public bool Surrounds(double x) => Min < x && x < Max;
+	public bool Surrounds(double x) => min < x && x < max;
 
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	public double Clamp(double x)
 	{
-		return Math.Clamp(x, Min, Max);
+		return Math.Clamp(x, min, max);
 	}
 
 	// Pad an interval by a given amount (delta).
@@ -49,7 +49,7 @@ public struct Interval
 	public Interval Expand(double delta)
 	{
 		double padding = delta/2;
-		return new(Min - padding, Max + padding);
+		return new(min - padding, max + padding);
 	}
 
 	public static readonly Interval Empty = new();

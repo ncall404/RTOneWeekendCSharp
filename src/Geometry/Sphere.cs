@@ -40,19 +40,19 @@ public class Sphere : Hittable
 
 		// Find the nearest root that lies in the acceptable range of rayTMin and rayTMax.
 		double root = (h - sqrtDiscriminant) / a;
-		if (root <= rayT.Min || rayT.Max <= root)
+		if (root <= rayT.min || rayT.max <= root)
 		{
 			root = (h + sqrtDiscriminant) / a;
-			if (root <= rayT.Min || rayT.Max <= root)
+			if (root <= rayT.min || rayT.max <= root)
 				return false;
 		}
 
-		rec.RayHitDistance = root;
-		rec.P = r.At(rec.RayHitDistance);
-		Vec3 outwardNormal = (rec.P - _center) / _radius;
+		rec.rayHitDistance = root;
+		rec.p = r.At(rec.rayHitDistance);
+		Vec3 outwardNormal = (rec.p - _center) / _radius;
 		rec.SetFaceNormal(r, outwardNormal);
-		(rec.U, rec.V) = GetSphereUV(outwardNormal); // Update hitrecord uv coordinates.
-		rec.Material = _material;
+		(rec.u, rec.v) = GetSphereUV(outwardNormal); // Update hitrecord uv coordinates.
+		rec.material = _material;
 
 		return true;
 	}

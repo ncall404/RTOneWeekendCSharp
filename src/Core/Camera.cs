@@ -163,7 +163,7 @@ public class Camera
 			Ray scattered;
 			Vec3 attenuation;
 
-			if (rec.Material.Scatter(r, rec, out attenuation, out scattered))
+			if (rec.material.Scatter(r, rec, out attenuation, out scattered))
 				return attenuation * RayColor(scattered, depth - 1, world);
 
 			return new Vec3(0, 0, 0);

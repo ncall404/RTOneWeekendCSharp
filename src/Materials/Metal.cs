@@ -17,10 +17,10 @@ class Metal: Material
     
 	public override bool Scatter(Ray rayIn, HitRecord rec, out Vec3 attenuation, out Ray scattered)
 	{
-		Vec3 reflected = Vec3.Reflect(rayIn.Direction, rec.Normal);
+		Vec3 reflected = Vec3.Reflect(rayIn.Direction, rec.normal);
 		reflected = Vec3.UnitVector(reflected) + (_fuzz * Vec3.RandomUnitVector());
-		scattered = new Ray(rec.P, reflected);
+		scattered = new Ray(rec.p, reflected);
 		attenuation = _albedo;
-		return Vec3.Dot(scattered.Direction, rec.Normal) > 0;
+		return Vec3.Dot(scattered.Direction, rec.normal) > 0;
 	}
 }

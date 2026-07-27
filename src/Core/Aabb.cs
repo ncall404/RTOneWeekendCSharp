@@ -53,28 +53,28 @@ public readonly struct Aabb
 	{
 		Vec3 rayOrigin = r.Origin;
 		Vec3 rayDirection = r.Direction;
-		Interval localRayT = new(rayT.Min, rayT.Max); // Create a copy of the input interval to avoid state leaking across function calls making it so that objects of the scene are not rendered.
+		Interval localRayT = new(rayT.min, rayT.max); // Create a copy of the input interval to avoid state leaking across function calls making it so that objects of the scene are not rendered.
 
 		for (int axis = 0; axis < 3; axis++)
 		{
 			Interval ax = AxisInterval(axis);
 			double adinv = 1.0 / rayDirection[axis]; // Axis direction inverse; AKA reciprocal ray direction.
 
-			double t0 = (ax.Min - rayOrigin[axis]) * adinv;
-			double t1 = (ax.Max - rayOrigin[axis]) * adinv;
+			double t0 = (ax.min - rayOrigin[axis]) * adinv;
+			double t1 = (ax.max - rayOrigin[axis]) * adinv;
 
 			if (t0 < t1)
 			{
-				if (t0 > localRayT.Min) localRayT.Min = t0;
-				if (t1 < localRayT.Max) localRayT.Max = t1;
+				if (t0 > localRayT.min) localRayT.min = t0;
+				if (t1 < localRayT.max) localRayT.max = t1;
 			}
 			else
 			{
-				if (t1 > localRayT.Min) localRayT.Min = t1;
-				if (t0 < localRayT.Max) localRayT.Max = t0;
+				if (t1 > localRayT.min) localRayT.min = t1;
+				if (t0 < localRayT.max) localRayT.max = t0;
 			}
 
-			if (localRayT.Max <= localRayT.Min) return false;
+			if (localRayT.max <= localRayT.min) return false;
 		}
 		return true;
 	}

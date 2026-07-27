@@ -42,14 +42,14 @@ public class HittableList : Hittable
 	{
 		HitRecord tempRec = default;
 		bool hitAnything = false;
-		double closestSoFar = rayT.Max;
+		double closestSoFar = rayT.max;
 		
 		foreach(Hittable obj in Objects)
 		{
-			if (obj.Hit(r, new Interval(rayT.Min, closestSoFar), ref tempRec))
+			if (obj.Hit(r, new Interval(rayT.min, closestSoFar), ref tempRec))
 			{
 				hitAnything = true;
-				closestSoFar = tempRec.RayHitDistance;
+				closestSoFar = tempRec.rayHitDistance;
 				rec = tempRec;
 			}
 		}
