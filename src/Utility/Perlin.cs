@@ -7,7 +7,7 @@ namespace RTOneWeekend.Utility;
 public class Perlin
 {
 	private const int PointCount = 256;
-	private double[] _randfloat = new double[PointCount];
+	private Vec3[] _randvec = new Vec3[PointCount];
 	private int[] _permX = new int[PointCount];
 	private int[] _permY = new int[PointCount];
 	private int[] _permZ = new int[PointCount];
@@ -16,7 +16,7 @@ public class Perlin
 	{
 		for (int i = 0; i < PointCount; i++)
 		{
-			_randfloat[i] = RandomNum.RandomDouble();
+			_randvec[i] = Vec3.UnitVector(Vec3.Random(-1, 1));
 		}
 
 		PerlinGeneratePerm(_permX);
@@ -30,16 +30,11 @@ public class Perlin
 		double v = p.Y - Math.Floor(p.Y);
 		double w = p.Z - Math.Floor(p.Z);
 
-		// Hermitian smoothing
-		u = u*u*(3 - 2*u);
-		v = v*v*(3 - 2*v);
-		w = w*w*(3 - 2*w);
-
 		int i = (int)Math.Floor(p.X);
 		int j = (int)Math.Floor(p.Y);
 		int k = (int)Math.Floor(p.Z);
 
-		double[,,] c = new double[2, 2, 2];
+		Vec3[,,] c = new Vec3[2, 2, 2];
 
 		for (int di = 0; di < 2; di++)
 		{
@@ -47,7 +42,7 @@ public class Perlin
 			{
 				for (int dk = 0; dk < 2; dk++)
 				{
-					c[di, dj, dk] = _randfloat[
+					c[di, dj, dk] = _randvec[
 						_permX[(i + di) & 255] ^
 						_permY[(j + dj) & 255] ^
 						_permZ[(k + dk) & 255]
@@ -56,7 +51,7 @@ public class Perlin
 			}
 		}
 
-		return TrilinearInterp(c, u, v, w);
+		return PerlinInterp(c, u, v, w);
 	}
 
 	private static void PerlinGeneratePerm(Span<int> p)
@@ -76,8 +71,13 @@ public class Perlin
 		}
 	}
 
-	private static double TrilinearInterp(double[,,] c, double u, double v, double w)
+	private static double PerlinInterp(Vec3[,,] c, double u, double v, double w)
 	{
+		// Hermitian smoothing
+		double uu = u*u*(3 - 2*u);
+		double vv = v*v*(3 - 2*v);
+		double ww = w*w*(3 - 2*w);
+
 		double accumulation = 0.0;
 
 		for (int i = 0; i < 2; i++)
@@ -86,10 +86,11 @@ public class Perlin
 			{
 				for (int k = 0; k < 2; k++)
 				{
-					accumulation += (i*u + (1-i)*(1-u)) *
-									(j*v + (1-j)*(1-v)) *
-									(k*w + (1-k)*(1-w)) *
-									c[i, j, k];
+					Vec3 weightValue = new(u-i, v-j, w-k);
+					accumulation += (i*uu + (1-i)*(1-uu)) *
+									(j*vv + (1-j)*(1-vv)) *
+									(k*ww + (1-k)*(1-ww)) *
+									Vec3.Dot(c[i, j, k], weightValue);
 				}
 			}
 		}

@@ -23,6 +23,6 @@ public class NoiseTexture : Texture
 
 	public override Vec3 Value(double u, double v, Vec3 p)
 	{
-		return new Vec3(1, 1, 1) * _noise.Noise(p * _scale);
+		return new Vec3(1, 1, 1) * 0.5 * (1 + _noise.Noise(p * _scale)); // Maps values to a range of 0 to 1 to keep from negative numbers being passed to LinearToGamma()
 	}
 }
