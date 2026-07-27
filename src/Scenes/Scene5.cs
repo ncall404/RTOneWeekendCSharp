@@ -24,7 +24,7 @@ public class Scene5 : Scene
 	{
 		HittableList world = new();
 
-		NoiseTexture noiseTexture = new();
+		NoiseTexture noiseTexture = new(4);
 
 		world.Add(new Sphere(new(0, -1000, 0), 1000, new Lambertian(noiseTexture)));
 		world.Add(new Sphere(new(0, 2, 0), 2, new Lambertian(noiseTexture)));
