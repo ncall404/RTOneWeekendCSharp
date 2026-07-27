@@ -7,19 +7,19 @@ namespace RTOneWeekend.Core;
 
 public class Camera
 {
-	public double AspectRatio = 16.0 / 9.0; // Width over height ratio.
-	public int Width = 400; // Rendered image width.
-	public int Height {get; private set;} // Rendered image height.
-	public int SamplesPerPixel = 100; // Number of samples per pixel for anti-aliasing. Could also probably be called rays-per-pixel.
-	public int MaxDepth = 100; // Maximum number of ray bounces into a scene.
+	public double AspectRatio { get; set; } = 16.0 / 9.0; // Width over height ratio.
+	public int Width { get; set; } = 400; // Rendered image width.
+	public int Height { get; private set; } // Rendered image height.
+	public int SamplesPerPixel { get; set; } = 100; // Number of samples per pixel for anti-aliasing. Could also probably be called rays-per-pixel.
+	public int MaxDepth { get; set; } = 100; // Maximum number of ray bounces into a scene.
 
-	public double VerticalFOV = 90; // Vertical field of view in degrees.
-	public Vec3 CameraPosition = new(0, 0, 0); // Named lookfrom in the tutorial
-	public Vec3 LookAt = new(0, 0, -1); // Point the camera is looking at. TODO: Replace later with ViewDirection.
-	public Vec3 Up = new(0, 1, 0); // Camera-relatvie up direction.
+	public double VerticalFOV { get; set; } = 90; // Vertical field of view in degrees.
+	public Vec3 CameraPosition { get; set; } = new(0, 0, 0); // Named lookfrom in the tutorial
+	public Vec3 LookAt { get; set; } = new(0, 0, -1); // Point the camera is looking at. TODO: Replace later with ViewDirection.
+	public Vec3 Up { get; set; } = new(0, 1, 0); // Camera-relatvie up direction.
 
-	public double DefocusAngle = 0; // Variation angle of rays through each pixel. 0 = no depth of field.
-	public double FocusDistance = 10; // Distance from the camera to the plane of perfect focus.
+	public double DefocusAngle { get; set; } = 0; // Variation angle of rays through each pixel. 0 = no depth of field.
+	public double FocusDistance { get; set; } = 10; // Distance from the camera to the plane of perfect focus.
 
 	private double _pixelSamplesScale; // Color scale factor for a sum of pixel samples.
 	private Vec3 _pixel00Location; // Location of the lower left pixel.
