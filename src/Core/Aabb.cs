@@ -4,11 +4,11 @@ using System.Runtime.CompilerServices;
 
 namespace RTOneWeekend.Core;
 
-public readonly struct Aabb
+public struct Aabb
 {
-	public readonly Interval X;
-	public readonly Interval Y;
-	public readonly Interval Z;
+	public Interval X;
+	public Interval Y;
+	public Interval Z;
 
 	// The default AABB is empty, since intervals are empty by default.
 	public Aabb()
@@ -23,6 +23,7 @@ public readonly struct Aabb
 		X = x;
 		Y = y;
 		Z = z;
+		PadToMinimums();
 	}
 
 	// Treats the two Vec3s as extrema (Max/Min for interval across entire domain) for the bounding box so that a particular minimum/maximum coordinatre order is not required.
@@ -31,6 +32,8 @@ public readonly struct Aabb
 		X = (a[0] <= b[0]) ? new(a[0], b[0]) : new(b[0], a[0]);
 		Y = (a[1] <= b[1]) ? new(a[1], b[1]) : new(b[1], a[1]);
 		Z = (a[2] <= b[2]) ? new(a[2], b[2]) : new(b[2], a[2]);
+
+		PadToMinimums();
 	}
 
 	// Create the bounding box that tightly surrounds two input bounding boxes.
@@ -94,4 +97,13 @@ public readonly struct Aabb
 
 	public static readonly Aabb Empty = new();
 	public static readonly Aabb Universe = new(Interval.Universe, Interval.Universe, Interval.Universe);
+
+	// Adjust the AABB so that no side is narrower than some delta, padding if necessary. This helps avoid numerical issues with ray intersection.
+	private void PadToMinimums()
+	{
+		double delta = 0.0001;
+		if (X.Size() < delta) X = X.Expand(delta);
+		if (Y.Size() < delta) Y = Y.Expand(delta);
+		if (Z.Size() < delta) Z = Z.Expand(delta);
+	}
 }
