@@ -7,10 +7,10 @@ namespace RTOneWeekend.Utility;
 public class Perlin
 {
 	private const int PointCount = 256;
-	private Vec3[] _randvec = new Vec3[PointCount];
-	private int[] _permX = new int[PointCount];
-	private int[] _permY = new int[PointCount];
-	private int[] _permZ = new int[PointCount];
+	private readonly Vec3[] _randvec = new Vec3[PointCount];
+	private readonly int[] _permX = new int[PointCount];
+	private readonly int[] _permY = new int[PointCount];
+	private readonly int[] _permZ = new int[PointCount];
 
 	public Perlin()
 	{
@@ -52,6 +52,22 @@ public class Perlin
 		}
 
 		return PerlinInterp(c, u, v, w);
+	}
+
+	public double Turbulance(Vec3 p, int depth)
+	{
+		double accumulation = 0.0;
+		double weight = 1.0;
+		Vec3 tempP = p;
+
+		for (int i = 0; i < depth; i++)
+		{
+			accumulation += weight * Noise(tempP);
+			weight *= 0.5;
+			tempP *= 2;
+		}
+
+		return Math.Abs(accumulation);
 	}
 
 	private static void PerlinGeneratePerm(Span<int> p)
