@@ -68,7 +68,7 @@ public class Quad : Hittable
 	}
 
 	// Given the hit point in plane coordinates, return false if it is outside the primitive, otherwise set the hit record UV coordinates and return true.
-	public bool IsInterior(double a, double b, ref HitRecord rec)
+	public virtual bool IsInterior(double a, double b, ref HitRecord rec)
 	{
 		Interval unitInterval = new(0, 1);
 
