@@ -8,7 +8,7 @@ namespace RTOneWeekend.Scenes;
 public class DefaultScene : Scene
 {
 	public override int ID { get; protected set; } = 0;
-	public override string Name { get; protected set; } = "Earth";
+	public override string Name { get; protected set; } = "Empty";
 
 	public override HittableList World { get; protected set; }
 	public override Camera Camera { get; protected set; }
