@@ -10,32 +10,16 @@ public static class SceneManager
 
 	public static Scene LoadScene(int id)
 	{
-		Scene activeScene;
-		switch (id)
+		Scene activeScene = id switch
 		{
-			case 0:
-				activeScene = new DefaultScene(); // Empty
-				break;
-			case 1:
-				activeScene = new Scene1(); // Three material spheres
-				break;
-			case 2:
-				activeScene = new Scene2(); // Bouncing spheres
-				break;
-			case 3:
-				activeScene = new Scene3(); // Checkered spheres
-				break;
-			case 4:
-				activeScene = new Scene4(); // Earth
-				break;
-			case 5:
-				activeScene = new Scene5(); // Perlin spheres
-				break;
-			default:
-				activeScene = new DefaultScene(); // Empty
-				break;
-		}
-
+			0 => new DefaultScene(),		// Empty
+			1 => new Scene1(),				// Three material spheres
+			2 => new Scene2(),				// Bouncing spheres
+			3 => new Scene3(),				// Checkered spheres
+			4 => new Scene4(),				// Earth
+			5 => new Scene5(),				// Perlin spheres
+			_ => new DefaultScene(),		// Empty
+		};
 		LoadedScene = id;
 		return activeScene;
 	}
