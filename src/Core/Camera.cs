@@ -152,7 +152,7 @@ public class Camera
 		return CameraPosition + (p.X * _defocusDiskU) + (p.Y * _defocusDiskV);
 	}
 
-	private static Vec3 RayColor(Ray r, int depth, Hittable world)
+	private Vec3 RayColor(Ray r, int depth, Hittable world)
     {
 		// If ray bounce limit is exceeded, no more light is gathered.
 		if (depth <= 0)
@@ -160,20 +160,18 @@ public class Camera
 
         HitRecord rec = default;
 		// 0.001 instead of just 0 takes care of shadow acne.
-		if (world.Hit(r, new Interval(0.001, double.PositiveInfinity), ref rec))
-		{
-			Ray scattered;
-			Vec3 attenuation;
+		if (!world.Hit(r, new Interval(0.001, double.PositiveInfinity), ref rec))
+			return Background;
 
-			if (rec.material.Scatter(r, rec, out attenuation, out scattered))
-				return attenuation * RayColor(scattered, depth - 1, world);
+		Vec3 emissionColor = rec.material.Emitted(rec.u, rec.v, rec.p);
 
-			return new Vec3(0, 0, 0);
-		}
+		if (!rec.material.Scatter(r, rec, out Vec3 attenuation, out Ray scattered))
+			return emissionColor;
 
 
-        Vec3 unitDirection = Vec3.UnitVector(r.Direction);
-        double a = 0.5 * (unitDirection.Y + 1.0);
-        return (1.0 - a) * new Vec3(1.0, 1.0, 1.0) + a * new Vec3(0.5, 0.7, 1.0); // Lerp between light blue and white based on ray Y position.
+        Vec3 scatterColor = attenuation * RayColor(scattered, depth-1, world);
+
+		return emissionColor + scatterColor;
+
     }
 }
