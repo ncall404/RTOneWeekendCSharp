@@ -5,8 +5,19 @@ using RTOneWeekend.Geometry;
 
 namespace RTOneWeekend.Materials;
 
-public abstract class Material
+public class Material
 {
 	public Material() {}
-	public abstract bool Scatter(Ray rayIn, HitRecord rec, out Vec3 attenuation, out Ray scattered);
+
+	public virtual Vec3 Emitted(double u, double v, Vec3 p)
+	{
+		return new Vec3(0, 0, 0);
+	}
+
+	public virtual bool Scatter(Ray rayIn, HitRecord rec, out Vec3 attenuation, out Ray scattered)
+	{
+		scattered = new Ray(rec.p, new(0, 0, 0));
+		attenuation = new(0, 0, 0);
+		return false;
+	}
 }
