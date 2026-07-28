@@ -1,7 +1,6 @@
 // DiffuseLight material class for representing lights in the scene.
 
 using RTOneWeekend.Core;
-using RTOneWeekend.Geometry;
 using RTOneWeekend.Textures;
 
 namespace RTOneWeekend.Materials;
