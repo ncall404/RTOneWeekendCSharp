@@ -9,7 +9,7 @@ namespace RTOneWeekend.Scenes;
 
 public class Scene5 : Scene
 {
-	public override int ID { get; protected set; } = 3;
+	public override int ID { get; protected set; } = 5;
 	public override string Name { get; protected set; } = "Perlin Spheres";
 
 	public override HittableList World { get; protected set; }
