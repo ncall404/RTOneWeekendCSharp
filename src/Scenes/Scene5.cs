@@ -24,14 +24,15 @@ public class Scene5 : Scene
 	{
 		HittableList world = new();
 
-		NoiseTexture noiseTexture = new(4);
+		NoiseTexture noiseTexture = new(8);
+		MarbleNoiseTexture marbleTexture = new(4, 7);
 
-		world.Add(new Sphere(new(0, -1000, 0), 1000, new Lambertian(noiseTexture)));
+		world.Add(new Sphere(new(0, -1000, 0), 1000, new Lambertian(marbleTexture)));
 		world.Add(new Sphere(new(0, 2, 0), 2, new Lambertian(noiseTexture)));
 
 		Camera camera = new(
 			16.0 / 9.0,				// Aspect ratio
-			700,					// Render width
+			1280,					// Render width
 			100,						// Samples per pixel
 			50,						// Max depth (number of bounces for rays)
 			20,						// Vertical field of view
