@@ -3,7 +3,6 @@
 using RTOneWeekend.Core;
 using RTOneWeekend.Geometry;
 using RTOneWeekend.Materials;
-using RTOneWeekend.Textures;
 
 namespace RTOneWeekend.Scenes;
 
