@@ -23,7 +23,7 @@ public class DefaultScene : Scene
 		// Returns an emptyr world and standard camera.
 		return (
 			new(), 
-			new(16.0/9.0, 10, 1, 1, 40, new(0, 0, 0), new(0, 0, -1), new(0, 1, 0))
+			new(16.0/9.0, 10, 1, 1, 40, new(0, 0, 0), new(0, 0, -1), new(0, 1, 0), new(0.7, 0.8, 1))
 		);
 	}
 

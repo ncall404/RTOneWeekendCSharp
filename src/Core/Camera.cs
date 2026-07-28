@@ -12,6 +12,7 @@ public class Camera
 	public int Height { get; private set; } // Rendered image height.
 	public int SamplesPerPixel { get; set; } = 100; // Number of samples per pixel for anti-aliasing. Could also probably be called rays-per-pixel.
 	public int MaxDepth { get; set; } = 100; // Maximum number of ray bounces into a scene.
+	public Vec3 Background { get; set; } // Scene background color.
 
 	public double VerticalFOV { get; set; } = 90; // Vertical field of view in degrees.
 	public Vec3 CameraPosition { get; set; } = new(0, 0, 0); // Named lookfrom in the tutorial
@@ -29,7 +30,7 @@ public class Camera
 	private Vec3 _defocusDiskU; // Defocus disk horizontal radius.
 	private Vec3 _defocusDiskV; // Defocus disk vertical radius.
 
-	public Camera(double aspectRatio, int width, int samplesPerPixel, int maxDepth, double verticalFOV, Vec3 cameraPosition, Vec3 lookAt, Vec3 up, double defocusAngle = 0, double focusDistance = 10)
+	public Camera(double aspectRatio, int width, int samplesPerPixel, int maxDepth, double verticalFOV, Vec3 cameraPosition, Vec3 lookAt, Vec3 up, Vec3 background, double defocusAngle = 0, double focusDistance = 10)
 	{
 		AspectRatio = aspectRatio;
 		Width = width;
@@ -39,6 +40,7 @@ public class Camera
 		CameraPosition = cameraPosition;
 		LookAt = lookAt;
 		Up = up;
+		Background = background;
 		DefocusAngle = defocusAngle;
 		FocusDistance = focusDistance;
 

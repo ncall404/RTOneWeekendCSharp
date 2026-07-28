@@ -44,6 +44,7 @@ public class Scene1 : Scene
 			new(-2, 2, 1),			// Camera position.
 			new(0, 0, -1),			// Look at point.
 			new(0, 1, 0),			// Up vector.
+			new(0.7, 0.8, 1),		// Background color.
 			10,						// Defocus Angle (for depth of field, 0 = no depth of field)
 			3.5						// Focus  distance (for depth of field)
 		);

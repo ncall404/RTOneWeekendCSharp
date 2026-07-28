@@ -45,7 +45,8 @@ public class Scene6 : Scene
 			80,						// Vertical field of view
 			new(0, 0, 9),			// Camera position.
 			new(0, 0, 0),			// Look at point.
-			new(0, 1, 0)			// Up vector.
+			new(0, 1, 0),			// Up vector.
+			new(0.7, 0.8, 1)		// Background color.
 		);
 
 		return (world, camera);

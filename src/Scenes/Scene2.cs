@@ -83,6 +83,7 @@ public class Scene2 : Scene
 			new(13, 2, 3),			// Camera position.
 			new(0, 0, 0),			// Look at point.
 			new(0, 1, 0),			// Up vector.
+			new(0.7, 0.8, 1),		// Background color.
 			0.6,					// Defocus Angle (for depth of field, 0 = no depth of field)
 			10.0					// Focus  distance (for depth of field)
 		);
