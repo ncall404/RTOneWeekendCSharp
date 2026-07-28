@@ -4,7 +4,7 @@ namespace RTOneWeekend.Scenes;
 
 public static class SceneManager
 {
-	public static int SceneCount { get; } = 7;
+	public static int SceneCount { get; } = 8;
 	public static int SelectedScene { get; set; } = 0;
 	public static int LoadedScene { get; set; } = 0;
 
@@ -20,6 +20,7 @@ public static class SceneManager
 			5 => new Scene5(),				// Perlin spheres
 			6 => new Scene6(),				// Quads
 			7 => new Scene7(),				// Triangles
+			8 => new Scene8(),				// Simple Light
 			_ => new DefaultScene(),		// Empty
 		};
 		LoadedScene = id;
