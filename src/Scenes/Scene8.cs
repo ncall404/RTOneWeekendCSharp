@@ -30,6 +30,7 @@ public class Scene8 : Scene
 		world.Add(new Sphere(new(0, 2, 0), 2, new Lambertian(marbleTexture)));
 
 		DiffuseLight diffuseLight = new(new Vec3(4, 4, 4));
+		world.Add(new Sphere(new(0, 7, 0), 2, diffuseLight));
 		world.Add(new Quad(new(3, 1, -2), new(2, 0, 0), new(0, 2, 0), diffuseLight));
 
 		Camera camera = new(
