@@ -6,14 +6,15 @@ namespace RTOneWeekend.Geometry;
 
 class Translate : Hittable
 {
-	private Hittable _obj;
+	private readonly Hittable _obj;
 	private Vec3 _offset;
 	public override Aabb BoundingBox { get; protected set; }
 
 	public Translate(Hittable obj, Vec3 offset)
 	{
 		_obj = obj;
-		BoundingBox = obj.BoundingBox + offset;
+		_offset = offset;
+		BoundingBox = obj.BoundingBox + _offset;
 	}
 
 	public override bool Hit(in Ray r, Interval rayT, ref HitRecord rec)
