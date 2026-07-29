@@ -79,4 +79,27 @@ public class Quad : Hittable
 		rec.v = b;
 		return true;
 	}
+
+	// Returns the 3D box (six sides) that contains the two opposite vertices a and b.
+	public static HittableList Box(Vec3 a, Vec3 b, Material material)
+	{
+		HittableList sides = new();
+
+		// Construct the two opposite vertices with the minimum and maximum coordinates.
+		Vec3 min = new(Math.Min(a.X, b.X), Math.Min(a.Y, b.Y), Math.Min(a.Z, b.Z));
+		Vec3 max = new(Math.Max(a.X, b.X), Math.Max(a.Y, b.Y), Math.Max(a.Z, b.Z));
+
+		Vec3 dx = new Vec3(max.X - min.X, 0, 0);
+		Vec3 dy = new Vec3(0, max.Y - min.Y, 0);
+		Vec3 dz = new Vec3(0, 0, max.Z - min.Z);
+
+		sides.Add(new Quad(new Vec3(min.X, min.Y, max.Z), dx, dy, material)); // Front
+		sides.Add(new Quad(new Vec3(max.X, min.Y, max.Z), -dz, dy, material)); // Right
+		sides.Add(new Quad(new Vec3(max.X, min.Y, min.Z), -dx, dy, material)); // Back
+		sides.Add(new Quad(new Vec3(min.X, min.Y, min.Z), dz, dy, material)); // Left
+		sides.Add(new Quad(new Vec3(min.X, max.Y, max.Z), dx, -dz, material)); // Top
+		sides.Add(new Quad(new Vec3(min.X, min.Y, min.Z), dx, dz, material)); // Bottom
+
+		return sides;
+	}
 }
