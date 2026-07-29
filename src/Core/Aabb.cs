@@ -98,6 +98,18 @@ public struct Aabb
 	public static readonly Aabb Empty = new();
 	public static readonly Aabb Universe = new(Interval.Universe, Interval.Universe, Interval.Universe);
 
+	// Addition operator to allow adding an offset to the AABB.
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Aabb operator +(Aabb bbox, Vec3 offset)
+	{
+		return new Aabb(bbox.X + offset.X, bbox.Y + offset.Y, bbox.Z + offset.Z);
+	}
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Aabb operator +(Vec3 offset, Aabb bbox)
+	{
+		return bbox + offset;
+	}
+
 	// Adjust the AABB so that no side is narrower than some delta, padding if necessary. This helps avoid numerical issues with ray intersection.
 	private void PadToMinimums()
 	{

@@ -54,4 +54,16 @@ public struct Interval
 
 	public static readonly Interval Empty = new();
 	public static readonly Interval Universe = new(double.NegativeInfinity, double.PositiveInfinity);
+
+	// Addition operator to allow adding an offset to the Interval.
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Interval operator +(Interval ival, double displacement)
+	{
+		return new(ival.min + displacement, ival.max + displacement);
+	}
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public static Interval operator +(double displacement, Interval ival)
+	{
+		return ival + displacement;
+	}
 }
