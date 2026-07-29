@@ -4,11 +4,11 @@ using System.Runtime.CompilerServices; // Using aggressive inlining since that a
 
 namespace RTOneWeekend.Core;
 
-public readonly struct Vec3(double x, double y, double z)
+public struct Vec3(double x, double y, double z)
 {
-	public readonly double X = x;
-	public readonly double Y = y;
-	public readonly double Z = z;
+	public double X = x;
+	public double Y = y;
+	public double Z = z;
 
 	// Property aliases for RGB color usage.
 	public double R => X;
@@ -19,7 +19,7 @@ public readonly struct Vec3(double x, double y, double z)
 	public double this[int index]
 	{
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		get
+		readonly get
 		{
 			return index switch
 			{
@@ -28,6 +28,24 @@ public readonly struct Vec3(double x, double y, double z)
 				2 => Z,
 				_ => throw new IndexOutOfRangeException()
 			};
+		}
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		set
+		{
+			switch (index)
+			{
+				case 0:
+					X = value;
+					break;
+				case 1:
+					Y = value;
+					break;
+				case 2:
+					Z = value;
+					break;
+				default:
+					throw new IndexOutOfRangeException();
+			}
 		}
 	}
 
