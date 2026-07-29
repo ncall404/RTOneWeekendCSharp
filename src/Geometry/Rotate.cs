@@ -1,8 +1,6 @@
 // Classes for Rotating hittable geometry.
 
-using System.Runtime.CompilerServices;
 using RTOneWeekend.Core;
-using RTOneWeekend.Materials;
 
 namespace RTOneWeekend.Geometry;
 
