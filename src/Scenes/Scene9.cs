@@ -37,6 +37,16 @@ public class Scene9 : Scene
 		world.Add(new Quad(new(555, 555, 555), new(-555, 0, 0), new(0, 0, -555), white));
 		world.Add(new Quad(new(0, 0, 555), new(555, 0, 0), new(0, 555, 0), white));
 
+		Hittable box1 = Quad.Box(new(0, 0, 0), new(165, 330, 165), white);
+		box1 = new RotateY(box1, 15);
+		box1 = new Translate(box1, new(265, 0, 295));
+		world.Add(box1);
+
+		Hittable box2 = Quad.Box(new(0, 0, 0), new(165, 165, 165), white);
+		box2 = new RotateY(box2, -18);
+		box2 = new Translate(box2, new(130, 0, 65));
+		world.Add(box2);
+
 		Camera camera = new(
 			16.0 / 9.0,				// Aspect ratio
 			1280,					// Render width
