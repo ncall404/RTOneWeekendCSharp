@@ -11,9 +11,9 @@ public struct Vec3(double x, double y, double z)
 	public double Z = z;
 
 	// Property aliases for RGB color usage.
-	public double R => X;
-	public double G => Y;
-	public double B => Z;
+	public readonly double R => X;
+	public readonly double G => Y;
+	public readonly double B => Z;
 
 	// Indexer (Allows access to X, Y, and Z with [0], [1], [2])
 	public double this[int index]
@@ -73,11 +73,11 @@ public struct Vec3(double x, double y, double z)
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	public double Length() => Math.Sqrt(LengthSquared());
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
-	public double LengthSquared() => X * X + Y * Y + Z * Z;
+	public readonly double LengthSquared() => X * X + Y * Y + Z * Z;
 
 	// Return true if the vector is close to zero in all dimensions.
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
-	public bool NearZero()
+	public readonly bool NearZero()
 	{
 		const double cutoff = 1e-8; // Near-zero value that accounts for floating-point imprecision. It seems it is also called "epsilon threshold".
 		return Math.Abs(X) < cutoff && Math.Abs(Y) < cutoff && Math.Abs(Z) < cutoff;
@@ -205,5 +205,5 @@ public struct Vec3(double x, double y, double z)
 	}
 
 	// Utility
-	public override string ToString() => $"({X}, {Y}, {Z})";
+	public override readonly string ToString() => $"({X}, {Y}, {Z})";
 }
