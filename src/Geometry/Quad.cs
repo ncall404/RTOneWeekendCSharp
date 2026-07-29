@@ -61,7 +61,7 @@ public class Quad : Hittable
 		// Ray hits the 2D shape; set the rest of the hit record and return true.
 		rec.rayHitDistance = t;
 		rec.p = intersectionPoint;
-		rec.normal = _normal;
+		rec.SetFaceNormal(r, _normal);
 		rec.material = _material;
 
 		return true;
