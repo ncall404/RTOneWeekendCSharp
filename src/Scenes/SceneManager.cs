@@ -4,7 +4,7 @@ namespace RTOneWeekend.Scenes;
 
 public static class SceneManager
 {
-	public static int SceneCount { get; } = 10;
+	public static int SceneCount { get; } = 12;
 	public static int SelectedScene { get; set; } = 0;
 	public static int LoadedScene { get; set; } = 0;
 
@@ -23,6 +23,8 @@ public static class SceneManager
 			8 => new Scene8(),				// Simple Light
 			9 => new Scene9(),				// Cornell Box
 			10 => new Scene10(),			// Volumetric Boxes
+			11 => new Scene11(),			// Spinning Cube
+			12 => new Scene12(),			// Book 2 Final
 			_ => new DefaultScene(),		// Empty
 		};
 		LoadedScene = id;
