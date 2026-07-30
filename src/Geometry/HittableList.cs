@@ -17,6 +17,11 @@ public class HittableList : Hittable
 		{
 			return Objects[index];
 		}
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		set
+		{
+			Objects[index] = value;
+		}
 	}
 
 	public override Aabb BoundingBox { get; protected set; } // Bounding box for all the objects in the list.
