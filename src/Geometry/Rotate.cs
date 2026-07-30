@@ -6,18 +6,18 @@ namespace RTOneWeekend.Geometry;
 
 class RotateY : Hittable
 {
-	private Hittable _obj;
-	private double sinTheta;
-	private double cosTheta;
+	public Hittable Obj { get; protected set; }
+	private double _sinTheta;
+	private double _cosTheta;
 	public override Aabb BoundingBox { get; protected set; }
 
 	public RotateY(Hittable obj, double angle)
 	{
-		_obj = obj;
+		Obj = obj;
 
 		double radians = ConvertUnit.DegreesToRadians(angle);
-		sinTheta = Math.Sin(radians);
-		cosTheta = Math.Cos(radians);
+		_sinTheta = Math.Sin(radians);
+		_cosTheta = Math.Cos(radians);
 
 		BoundingBox = obj.BoundingBox;
 
@@ -34,8 +34,8 @@ class RotateY : Hittable
 					double y = j * BoundingBox.Y.max + (1 - j) * BoundingBox.Y.min;
 					double z = k * BoundingBox.Z.max + (1 - k) * BoundingBox.Z.min;
 
-					double newX = (cosTheta * x) - (sinTheta * z);
-					double newZ = (sinTheta * x) + (cosTheta * z);
+					double newX = (_cosTheta * x) - (_sinTheta * z);
+					double newZ = (_sinTheta * x) + (_cosTheta * z);
 
 					Vec3 tester = new(newX, y, newZ);
 
@@ -55,33 +55,33 @@ class RotateY : Hittable
 	{
 		// Transform the ray from world space to object space.
 		Vec3 origin = new Vec3(
-			(cosTheta * r.Origin.X) - (sinTheta * r.Origin.Z),
+			(_cosTheta * r.Origin.X) - (_sinTheta * r.Origin.Z),
 			r.Origin.Y,
-			(sinTheta * r.Origin.X) + (cosTheta * r.Origin.Z)
+			(_sinTheta * r.Origin.X) + (_cosTheta * r.Origin.Z)
 		);
 		Vec3 direction = new Vec3(
-			(cosTheta * r.Direction.X) - (sinTheta * r.Direction.Z),
+			(_cosTheta * r.Direction.X) - (_sinTheta * r.Direction.Z),
 			r.Direction.Y,
-			(sinTheta * r.Direction.X) + (cosTheta * r.Direction.Z)
+			(_sinTheta * r.Direction.X) + (_cosTheta * r.Direction.Z)
 		);
 
 		Ray rotatedRay = new(origin, direction);
 
 		// Determine whether an intersection exists in object space (and if so where).
-		if (!_obj.Hit(rotatedRay, rayT, ref rec))
+		if (!Obj.Hit(rotatedRay, rayT, ref rec))
 			return false;
 
 		// Transform the intersection from object space back to world space.
 		rec.p = new Vec3(
-			(cosTheta * rec.p.X) + (sinTheta * rec.p.Z),
+			(_cosTheta * rec.p.X) + (_sinTheta * rec.p.Z),
 			rec.p.Y,
-			(-sinTheta * rec.p.X) + (cosTheta * rec.p.Z)
+			(-_sinTheta * rec.p.X) + (_cosTheta * rec.p.Z)
 		);
 
 		rec.normal = new Vec3(
-			(cosTheta * rec.normal.X) + (sinTheta * rec.normal.Z),
+			(_cosTheta * rec.normal.X) + (_sinTheta * rec.normal.Z),
 			rec.normal.Y,
-			(-sinTheta * rec.normal.X) + (cosTheta * rec.normal.Z)
+			(-_sinTheta * rec.normal.X) + (_cosTheta * rec.normal.Z)
 		);
 
 		return true;
