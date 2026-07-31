@@ -54,9 +54,16 @@ public class Scene4 : Scene
 		if (World[0] is Sphere sphere)
 		{
 			if (Settings.RealTimeRender)
+			{
+				if (Settings.AntiAliasing)
+					Settings.AntiAliasing = false;
+					
 				sphere.UpdateRotationOffset(SDL.GetTicks() * 0.0001);
+			}
 			else
+			{
 				sphere.UpdateRotationOffset(0);
+			}
 		}
 	}
 }
