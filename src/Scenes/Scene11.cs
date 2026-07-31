@@ -36,7 +36,7 @@ public class Scene11 : Scene
 		Material light = new DiffuseLight(new Vec3(2, 2, 2));
 
 		// Box
-		world.Add(new RotateY(Quad.Box(new(-1, -1, -1), new(1, 1, 1), metal), 45)); // Spinning cube
+		world.Add(new RotateY(Quad.Box(new(-1, -1, -1), new(1, 1, 1), metal), 45)); // Floating cube
 		world.Add(new Sphere(new Vec3(0, -1010, 0), 1000, checkerMat)); // Ground sphere
 		world.Add(new Sphere(new Vec3(3, 0.5, 0), 1, blue)); // Solid accent sphere
 		world.Add(new Sphere(new Vec3(-3, 0.5, 0), 1, glass)); // Glass accent sphere
@@ -44,7 +44,7 @@ public class Scene11 : Scene
 
 		Camera camera = new(
 			16.0 / 9.0,				// Aspect ratio
-			1280,					// Render width
+			700,					// Render width
 			100,					// Samples per pixel
 			20,						// Max depth (number of bounces for rays)
 			70,						// Vertical field of view
